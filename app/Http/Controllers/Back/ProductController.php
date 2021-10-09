@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use Alert;
+use Storage;
 
 class ProductController extends Controller
 {
@@ -16,7 +17,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $data['product'] = Product::all();
+        $data['product'] = Product::paginate(6);
         return view('back.product.index', $data);
     }
 
@@ -25,6 +26,28 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function checkProductName(Request $request) 
+    {
+        if($request->Input('product_name')){
+            $product_name = Product::where('name',$request->Input('product_name'))->first();
+            if($product_name){
+                return 'false';
+            }else{
+                return  'true';
+            }
+        }
+
+        if($request->Input('edit_product_name')){
+            $edit_product_name = Product::where('name',$request->Input('edit_product_name'))->first();
+            if($edit_product_name){
+                return 'false';
+            }else{
+                return  'true';
+            }
+        }
+    }
+
     public function create()
     {
         //
@@ -38,12 +61,12 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-        $image = ($request->image) ? $request->file('image')->store("/public/input/products") : null;
+        $image = ($request->product_image) ? $request->file('product_image')->store("/public/input/products") : null;
         
         $data = [
-            'name' => $request->name,
-            'description' => $request->description,
-            'youtube' => $request->youtube,
+            'name' => $request->product_name,
+            'description' => $request->product_description,
+            'youtube' => $request->product_youtube,
             'image' => $image
         ];
 
@@ -86,18 +109,18 @@ class ProductController extends Controller
     public function update(Request $request, $id)
     {
         $product = Product::findOrFail($id);
-        if($request->hasFile('edit_image')) {
+        if($request->hasFile('edit_product_image')) {
             if(Storage::exists($product->image) && !empty($product->image)) {
                 Storage::delete($product->image);
             }
 
-            $edit_image = $request->file("edit_image")->store("/public/input/products");
+            $edit_image = $request->file("edit_product_image")->store("/public/input/products");
         }
         $data = [
-            'name' => $request->edit_name ? $request->edit_name : $product->name,
-            'description' => $request->edit_description ? $request->edit_description : $product->description,
-            'youtube' => $request->edit_youtube ? $request->edit_youtube : $product->youtube,
-            'image' => $request->hasFile('edit_image') ? $edit_image : $product->image,
+            'name' => $request->edit_product_name ? $request->edit_product_name : $product->name,
+            'description' => $request->edit_product_description ? $request->edit_product_description : $product->description,
+            'youtube' => $request->edit_product_youtube ? $request->edit_product_youtube : $product->youtube,
+            'image' => $request->hasFile('edit_product_image') ? $edit_image : $product->image,
            
         ];
 
@@ -123,5 +146,25 @@ class ProductController extends Controller
             : Alert::error('Error', "Product gagal dihapus!");
 
         return redirect()->back();
+    }
+
+    public function destroyAll(Request $request)
+    {
+        if(empty($request->id)) {
+            Alert::info('Info', "Tidak ada product yang dipilih.");
+            return redirect()->back();
+        } else {
+            $product = $request->id;
+        
+            foreach($product as $products) {
+                Product::where('id', $products)->delete()
+                ? Alert::success('Berhasil', "Semua Product yang dipilih telah berhasil dihapus.")
+                : Alert::error('Error', "Product gagal dihapus!");
+            }
+               
+    
+            return redirect()->back();
+        }
+        
     }
 }

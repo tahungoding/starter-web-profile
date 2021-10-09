@@ -4,6 +4,11 @@ namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Team;
+use App\Models\Division;
+use App\Models\SubDivision;
+use Storage;
+use Alert;
 
 class TeamController extends Controller
 {
@@ -14,7 +19,10 @@ class TeamController extends Controller
      */
     public function index()
     {
-        return view('back.team.index');
+        $data['team'] = Team::all();
+        $data['division'] = Division::all();
+        $data['sub_division'] = SubDivision::all();
+        return view('back.team.index', $data);
     }
 
     /**
@@ -22,6 +30,7 @@ class TeamController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
     public function create()
     {
         //
@@ -35,7 +44,21 @@ class TeamController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $photo = ($request->team_photo) ? $request->file('team_photo')->store("/public/input/teams") : null;
+        
+        $data = [
+            'fullname' => $request->team_fullname,
+            'photo' => $photo,
+            'position' => $request->team_position,
+            'division_id' => $request->team_division_id,
+            'sub_division_id' => $request->team_sub_division_id,
+        ];
+
+        Team::create($data)
+        ? Alert::success('Berhasil', 'Team telah berhasil ditambahkan!')
+        : Alert::error('Error', 'Team gagal ditambahkan!');
+
+        return redirect()->back();
     }
 
     /**
@@ -69,7 +92,27 @@ class TeamController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $team = Team::findOrFail($id);
+        if($request->hasFile('edit_team_photo')) {
+            if(Storage::exists($team->photo) && !empty($team->photo)) {
+                Storage::delete($team->photo);
+            }
+
+            $edit_photo = $request->file('edit_team_photo')->store('/public/input/teams');
+        }
+        $data = [
+            'fullname' => $request->edit_team_fullname ? $request->edit_team_fullname : $team->fullname, 
+            'photo' => $request->hasFile('edit_team_photo') ? $edit_photo : $team->photo, 
+            'position' => $request->edit_team_position ? $request->edit_team_position : $team->position, 
+            'division_id' => $request->edit_team_division_id ? $request->edit_team_division_id : $team->division_id, 
+            'sub_division_id' => $request->edit_team_sub_division_id ? $request->edit_team_sub_division_id : $team->sub_division_id, 
+        ];
+
+        $team->update($data)
+        ? Alert::success('Berhasil', "Team telah berhasil diubah!")
+        : Alert::error('Error', "Team gagal diubah!");
+
+        return redirect()->back();
     }
 
     /**
@@ -80,6 +123,27 @@ class TeamController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $team = Team::findOrFail($id);
+       
+        $team->delete()
+            ? Alert::success('Berhasil', "Team telah berhasil dihapus.")
+            : Alert::error('Error', "Team gagal dihapus!");
+
+        return redirect()->back();
+    }
+
+    public function destroyAll()
+    {
+        $team = Team::all();
+
+        foreach($team as $teams) {
+            $teams->delete();
+        }
+
+        (count(Team::all()) <= 1)
+        ? Alert::success('Berhasil', "Semua Team telah berhasil dihapus.")
+        : Alert::error('Error', "Team gagal dihapus!");
+
+        return redirect()->back();
     }
 }

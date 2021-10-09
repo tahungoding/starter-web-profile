@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Back;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use Storage;
 use Alert;
 
 class ProjectController extends Controller
@@ -37,14 +38,14 @@ class ProjectController extends Controller
             }
         }
 
-        // if($request->Input('edit_tahun')){
-        //     $edit_tahun = Recruitment::where('tahun',$request->Input('edit_tahun'))->first();
-        //     if($edit_tahun){
-        //         return 'false';
-        //     }else{
-        //         return  'true';
-        //     }
-        // }
+        if($request->Input('edit_project_name')){
+            $edit_project_name = Project::where('name',$request->Input('edit_project_name'))->first();
+            if($edit_project_name){
+                return 'false';
+            }else{
+                return  'true';
+            }
+        }
     }
 
     public function create()
@@ -66,8 +67,9 @@ class ProjectController extends Controller
             'name' => $request->project_name,
             'description' => $request->project_description,
             'youtube' => $request->project_youtube,
-            'image' => $image,
             'date_start' => $request->project_date_start,
+            'date_end' => $request->project_date_end,
+            'image' => $image,
         ];
 
         Project::create($data)
@@ -108,18 +110,20 @@ class ProjectController extends Controller
     public function update(Request $request, $id)
     {
         $project = Project::findOrFail($id);
-        if($request->hasFile('edit_image')) {
+        if($request->hasFile('edit_project_image')) {
             if(Storage::exists($project->image) && !empty($project->image)) {
                 Storage::delete($project->image);
             }
 
-            $edit_image = $request->file("edit_image")->store("/public/input/projects");
+            $edit_image = $request->file("edit_project_image")->store("/public/input/projects");
         }
         $data = [
-            'name' => $request->edit_name ? $request->edit_name : $project->name,
-            'description' => $request->edit_description ? $request->edit_description : $project->description,
-            'youtube' => $request->edit_youtube ? $request->edit_youtube : $project->youtube,
-            'image' => $request->hasFile('edit_image') ? $edit_image : $project->image,
+            'name' => $request->edit_project_name ? $request->edit_project_name : $project->name,
+            'description' => $request->edit_project_description ? $request->edit_project_description : $project->description,
+            'youtube' => $request->edit_project_youtube ? $request->edit_project_youtube : $project->youtube,
+            'date_start' => $request->edit_project_date_start ? $request->edit_project_date_start : $project->date_start,
+            'date_end' => $request->edit_project_date_end ? $request->edit_project_date_end : $project->date_end,
+            'image' => $request->hasFile('edit_project_image') ? $edit_image : $project->image,
            
         ];
 
@@ -145,5 +149,25 @@ class ProjectController extends Controller
             : Alert::error('Error', "Project gagal dihapus!");
 
         return redirect()->back();
+    }
+
+    public function destroyAll(Request $request)
+    {
+        if(empty($request->id)) {
+            Alert::info('Info', "Tidak ada project yang dipilih.");
+            return redirect()->back();
+        } else {
+            $project = $request->id;
+        
+            foreach($project as $projects) {
+                Project::where('id', $projects)->delete()
+                ? Alert::success('Berhasil', "Semua Project yang dipilih telah berhasil dihapus.")
+                : Alert::error('Error', "Project gagal dihapus!");
+            }
+               
+    
+            return redirect()->back();
+        }
+        
     }
 }

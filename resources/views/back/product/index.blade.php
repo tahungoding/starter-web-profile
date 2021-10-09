@@ -1,11 +1,17 @@
 @extends('layouts.main')
 @section('title', 'Product')
 @section('css')
-<link rel="stylesheet" href="https://cdn.datatables.net/1.11.0/css/dataTables.bootstrap4.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/fixedheader/3.1.9/css/fixedHeader.bootstrap.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.2.9/css/responsive.bootstrap.min.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css"
+  integrity="sha512-EZSUkJWTjzDlspOoPSpUFR0o0Xy7jdzW//6qhUkoZ9c4StFkVsp9fbbd0O06p9ELS3H486m4wmrCELjza4JEog=="
+  crossorigin="anonymous" referrerpolicy="no-referrer" />
 <style>
+  .dropify-wrapper {
+    border: 1px solid #e2e7f1;
+    border-radius: .3rem;
+    height: 150px;
+  }
+
   .card {
     border-radius: 10px;
   }
@@ -24,6 +30,10 @@
     color: #f1556c;
     border: 1px solid #f1556c;
   }
+
+  #buttonGroup {
+    display: block;
+  } 
 </style>
 @endsection
 @section('container')
@@ -31,7 +41,7 @@
   <div class="section-header">
     <h1>Product</h1>
     <div class="section-header-breadcrumb">
-      <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
+      <div class="breadcrumb-item active"><a href="{{ route('dashboard.index') }}">Dashboard</a></div>
       <div class="breadcrumb-item">Product</div>
     </div>
   </div>
@@ -45,75 +55,96 @@
         <div class="card">
           <div class="card-header">
             <div class="d-flex justify-content-between w-100">
-              <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#tambahProduk"><i
+              <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#tambahProduct"><i
                   class="fas fa-plus-circle"></i></button>
-              <button class="btn btn-sm btn-secondary"><i class="fas fa-cog"></i></button>
+              @if (count($product))
+              <div class="d-flex justify-content-between">
+                <input type="search" class="form-control" autocomplete="off" style="margin-right: 20px;">
+                <input type="checkbox" id="checkAll" autocomplete="off" style="margin-right: 20px; display:none;">
+                <button class="btn btn-sm btn-danger" id="deleteAllButton" data-toggle="modal"
+                  data-target="#deleteAllConfirm" style="margin-right: 20px; display:none;"><i
+                    class="fas fa-trash"></i></button>
+                <button class="btn btn-sm btn-secondary" onclick="setting()"><i class="fas fa-cog"></i></button>
+              </div>
+              @else
+              <div class="d-flex justify-content-between">
+                <input type="checkbox" id="checkAllEmpty" autocomplete="off" style="margin-right: 20px; display:none;"
+                  disabled>
+                <button class="btn btn-sm btn-danger" id="deleteAllEmpty" style="margin-right: 20px; display:none;"
+                  disabled><i class="fas fa-trash"></i></button>
+                <button class="btn btn-sm btn-secondary" id="setting"><i class="fas fa-cog"></i></button>
+              </div>
+              @endif
+            </div>
+          </div>  
+        </div>
+
+      </div>
+    </div>
+    <form action="{{ route('products.destroyAll') }}" method="post" id="destroyAllForm">
+      @csrf
+      <div class="row">
+        @foreach ($product as $products)
+        <div class="col-md-4">
+         
+          <div class="card" id="thisIs">
+            <div class="card-body">
+                <input type="checkbox" name='id[]' class="checkbox mb-3" value="{{ $products->id }}" autocomplete="off"
+                  style="display: none;" disabled>
+              <h6>{{ Str::limit($products->name, 30) }}</h6>
+              <img src="{{ Storage::url($products->image) }}" class="img-fluid rounded mt-1"
+                style="width:100%; height:200px; object-fit:cover;">
+              <div class="btn-group text-center buttonGroup mt-3" id="buttonGroup">
+                <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
+                  data-target="#editProduct{{ $products->id }}"><i class="far fa-edit"></i></button>
+                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteConfirm"
+                  onclick="deleteThisProduct({{$products}})"><i class="far fa-trash-alt"></i></button>
+                <button type="button" class="btn btn-sm btn-dark" data-toggle="modal" data-target="#more{{ $products->id }}">More</button>
+              </div>
             </div>
           </div>
-          <div class="card-body">
-            <table id="productTable" class="table table-striped table-bordered" style="width:100%">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Nama</th>
-                  <th>Deskripsi</th>
-                  <th>Youtube</th>
-                  <th>Gambar</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                @php
-                    $increment = 1;
-                @endphp
-                @foreach ($product as $products)
-                <tr>
-                  <td>{{ $increment++ }}</td>
-                  <td>{{ $products->name }}</td>
-                  <td>{{ $products->description }}</td>
-                  <td>{{ $products->youtube }}</td>
-                  <td>{{ $products->youtube }}</td>
-                  <td>
-                    <button class="btn btn-sm btn-warning" data-toggle="modal" data-target="#editProduk" onclick="editProduct({{$products}})"><i
-                        class="far fa-edit"></i></button>
-                    <button class="btn btn-sm btn-danger"><i class="far fa-trash-alt"></i></button>
-                  </td>
-                </tr>
-                @endforeach
-              </tbody>
-            </table>
-          </div>
         </div>
+        @endforeach
       </div>
+    </form>
+    <div class="d-flex justify-content-center">
+      {{ $product->links('vendor.pagination.custom_pagination') }}
     </div>
   </div>
 </section>
 @endsection
 
 @section('modal')
-<div class="modal fade" tabindex="-1" role="dialog" id="tambahProduk">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+<div class="modal fade" tabindex="-1" role="dialog" id="tambahProduct">
+  <div class="modal-dialog " role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Tambah Produk</h5>
+        <h5 class="modal-title">Tambah Product</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form action="{{ route('products.store') }}" method="post" id="tambahProdukForm" enctype="multipart/form-data">
+      <form action="{{ route('products.store') }}" method="post" id="tambahProductForm" enctype="multipart/form-data">
         @csrf
         <div class="modal-body">
           <div class="form-group">
-            <input type="text" class="form-control" name="name" placeholder="Nama">
+            <label for="name">Nama</label>
+            <input type="text" class="form-control" name="product_name" placeholder="Nama">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" name="description" placeholder="Deskripsi">
+            <label for="description">Deskripsi</label>
+            <textarea class="form-control" name="product_description" placeholder="Deskripsi" style="height: 100%;"></textarea>
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" name="youtube" placeholder="Link Youtube">
+            <label for="youtube">Youtube</label>
+            <input type="text" class="form-control" name="product_youtube" placeholder="Link Youtube">
           </div>
           <div class="form-group">
-            <input type="file" class="form-control" name="image">
+            <label for="image">Gambar</label>
+            <input type="file" class="form-control dropify" name="product_image"
+              data-allowed-file-extensions="png jpg jpeg" data-show-remove="false">
+            <div id="errorImage">
+            </div>
           </div>
         </div>
         <div class="modal-footer bg-whitesmoke br">
@@ -125,47 +156,136 @@
   </div>
 </div>
 
-<div class="modal fade" tabindex="-1" role="dialog" id="editProduk">
+@foreach ($product as $products)
+<div class="modal fade" tabindex="-1" role="dialog" id="editProduct{{$products->id}}">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit Produk</h5>
+        <h5 class="modal-title">Edit Products</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form action="{{ route('products.update', '') }}" method="post" id="editProdukForm" enctype="multipart/form-data">
+      <form action="{{ route('products.update', $products->id) }}" method="post" id="editProductForm"
+        enctype="multipart/form-data">
         @csrf
+        @method('PUT')
+        <input type="hidden" id="checkProductName" value="{{ $products->name }}">
         <div class="modal-body">
           <div class="form-group">
-            <input type="text" class="form-control" name="edit_name" id="editName" placeholder="Nama">
+            <label for="name">Nama</label>
+            <input type="text" class="form-control" name="edit_product_name" id="editName" placeholder="Nama"
+              value="{{ $products->name }}">
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" name="edit_description" id="editDescription" placeholder="Deskripsi">
+            <label for="description">Deskripsi</label>
+            <textarea class="form-control" name="edit_product_description" placeholder="Deskripsi" style="height: 100%;">{{ $products->description }}</textarea>
           </div>
           <div class="form-group">
-            <input type="text" class="form-control" name="edit_youtube" id="editYoutube" placeholder="Link Youtube">
+            <label for="youtube">Youtube</label>
+            <input type="text" class="form-control" name="edit_product_youtube" id="editYoutube"
+              placeholder="Link Youtube" value="{{ $products->youtube }}">
           </div>
           <div class="form-group">
-            <input type="file" class="form-control" name="edit_image" id="edit_image">
+            <label for="image">Gambar</label>
+            <input type="file" class="form-control dropify" name="edit_product_image"
+              data-allowed-file-extensions="png jpg jpeg" data-default-file="@if(!empty($products->image) &&
+                            Storage::exists($products->image)){{ Storage::url($products->image) }}@endif"
+              data-show-remove="false">
           </div>
         </div>
         <div class="modal-footer bg-whitesmoke br">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
-          <button type="submit" class="btn btn-primary" id="editButton">Tambah</button>
+          <button type="submit" class="btn btn-primary" id="editProductButton">Ubah</button>
         </div>
       </form>
     </div>
   </div>
 </div>
+@endforeach
+
+@foreach ($product as $products)
+<div class="modal fade" tabindex="-1" role="dialog" id="more{{$products->id}}">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Rincian</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>{{ $products->name }}</p>
+        @if(!empty($products->image) && Storage::exists($products->image))
+          <img src="{{ Storage::url($products->image) }}" alt="" class="img-fluid rounded mt-1"
+                style="width:100%; height:200px; object-fit:cover;">
+        @endif
+        <br><br>
+        <p>{{ $products->description }}</p>
+        @if (isset($products->youtube))
+          <input type="text" class="form-control" value="{{ $products->youtube }}" readonly>
+        @endif
+      </div>
+      <div class="modal-footer bg-whitesmoke br">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+      </div>
+    </div>
+  </div>
+</div>    
+@endforeach
+
+<div class="modal fade" tabindex="-1" role="dialog" id="deleteConfirm">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Hapus</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <form action="{{ route('products.destroy', '') }}" method="post" id="deleteProductForm">
+        @csrf
+        @method('delete')
+        <div class="modal-body">
+          Apakah anda yakin untuk <b>menghapus</b> product ini ?
+        </div>
+        <div class="modal-footer bg-whitesmoke br">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+          <button type="submit" class="btn btn-primary" id="deleteModalButton">Ya, Hapus Semua</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="deleteAllConfirm">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Hapus Semua</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        Apakah anda yakin untuk <b>menghapus semua</b> product ?
+      </div>
+      <div class="modal-footer bg-whitesmoke br">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
+        <button type="button" class="btn btn-primary" id="deleteAllModalButton">Ya, Hapus Semua</button>
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 @section('js')
-<script src="https://cdn.datatables.net/1.11.0/js/jquery.dataTables.min.js"></script>
-<script src="https://cdn.datatables.net/1.11.0/js/dataTables.bootstrap4.min.js"></script>
-<script src="https://cdn.datatables.net/fixedheader/3.1.9/js/dataTables.fixedHeader.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.2.9/js/dataTables.responsive.min.js"></script>
-<script src="https://cdn.datatables.net/responsive/2.2.9/js/responsive.bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"
+  integrity="sha512-8QFTrG0oeOiyWo/VM9Y8kgxdlCryqhIxVeRpWSezdRRAvarxVtwLnGroJgnVW9/XBRduxO/z1GblzPrMQoeuew=="
+  crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  $('.dropify').dropify();
+</script>
 <script>
   $(document).ready(function() {
 
@@ -175,88 +295,120 @@
       }
   });
   
-  $("#tambahProdukForm").validate({
+  $("#tambahProductForm").validate({
       rules: {
-          name:{
+          product_name:{
               required: true,
               remote: {
-                        url: "",
+                        url: "{{ route('checkProductName') }}",
                         type: "post",
-                      }
+              }
           },
-          description:{
+          product_description:{
               required: true,
           },
-          youtube:{
+          product_image:{
               required: true,
           },
       },
       messages: {
-          name: {
+          product_name: {
                 required: "Nama harus di isi",
-                remote: "Nama sudah tersedi"
+                remote: "Nama sudah tersedia"
           },
-          description: {
+          product_description: {
                   required: "Deskripsi harus di isi",
           },
-          youtube: {
-                  required: "Youtube harus di isi",
-          }
+          product_image: {
+                  required: "Gambar harus di isi",
+          },
+      },
+      errorPlacement: function(error, element) {
+        if(element.attr("name") == "product_image") {
+          error.appendTo("#errorImage");
+          // $(".dropify-wrapper").css('border-color', '#f1556c');
+        } else {
+          error.insertAfter(element);
+        }
       },
       submitHandler: function(form) {
         $("#tambahButton").prop('disabled', true);
             form.submit();
       }
   });
+});
 
-  $("#editProdukForm").validate({
+  $("#editProductForm").validate({
       rules: {
-          edit_name:{
+        edit_product_name:{
               required: true,
               remote: {
-                        url: "",
-                        type: "post",
+                        param: {
+                              url: "{{ route('checkProductName') }}",
+                              type: "post",
+                        },
+                        depends: function(element) {
+                          // compare name in form to hidden field
+                          return ($(element).val() !== $('#checkProductName').val());
+                        },
                       }
           },
-          edit_description:{
-              required: true,
-          },
-          edit_youtube:{
+          edit_product_description:{
               required: true,
           },
       },
       messages: {
-        edit_name: {
+        edit_product_name: {
                 required: "Nama harus di isi",
-                remote: "Nama sudah tersedi"
+                remote: "Nama sudah tersedia"
           },
-          edit_description: {
+          edit_product_description: {
                   required: "Deskripsi harus di isi",
           },
-          edit_youtube: {
-                  required: "Youtube harus di isi",
-          }
       },
       submitHandler: function(form) {
-        $("#editButton").prop('disabled', true);
+        $("#editProductButton").prop('disabled', true);
             form.submit();
       }
   });
-  
-  $('#productTable').DataTable({
-      responsive: true
-  });
+
+$("#deleteAllModalButton").click(function() {
+    $(this).attr('disabled', true); 
+    $("#destroyAllForm").submit();
 });
 
+const deleteProduct = $("#deleteProductForm").attr('action');
 
-const updateProduct = $("#editProdukForm").attr('action');
+  function deleteThisProduct(data) {
+    $("#deleteProductForm").attr('action', `${deleteProduct}/${data.id}`);
+  }
 
-  function editProduct(data) {
-    $("#editProdukForm").attr('action', `${updateProduct}/${data.id}`);
-    $("#editName").val(data.name);
-    $("#editDescription").val(data.description);
-    $("#editYoutube").val(data.youtube);
-    $("#editImage").val(data.youtube);
-  } 
+  function readDescription(data) {
+    $("#descriptionText").html(data.description);
+  }
+
+  $("#setting").click(function() {
+      $("#checkAllEmpty").toggle();  
+      $("#deleteAllEmpty").toggle();
+  });
+
+  function setting() {
+    $("input:checkbox").toggle();
+    $("#deleteAllButton").toggle(); 
+  }
+
+
+  $("#deleteAllButton").attr('disabled', true); 
+
+  $("#checkAll").click(function () {
+        $('input:checkbox').not(this).prop('checked', this.checked);
+        if($(this).is(":checked")){
+            $("#deleteAllButton").attr('disabled', false); 
+            $(".checkbox").attr('disabled', false); 
+        } else if($(this).is(":not(:checked)")) {
+            $("#deleteAllButton").attr('disabled', true); 
+            $(".checkbox").attr('disabled', true); 
+        }
+    });
 </script>
 @endsection

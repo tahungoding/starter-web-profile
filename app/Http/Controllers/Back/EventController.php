@@ -4,6 +4,9 @@ namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Event;
+use Storage;
+use Alert;
 
 class EventController extends Controller
 {
@@ -14,7 +17,8 @@ class EventController extends Controller
      */
     public function index()
     {
-        return view('back.event.index');
+        $data['event'] = Event::paginate(6);
+        return view('back.event.index', $data);
     }
 
     /**
@@ -22,6 +26,28 @@ class EventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function checkEventName(Request $request) 
+    {
+        if($request->Input('event_name')){
+            $event_name = Event::where('name',$request->Input('event_name'))->first();
+            if($event_name){
+                return 'false';
+            }else{
+                return  'true';
+            }
+        }
+
+        if($request->Input('edit_event_name')){
+            $edit_event_name = Event::where('name',$request->Input('edit_event_name'))->first();
+            if($edit_event_name){
+                return 'false';
+            }else{
+                return  'true';
+            }
+        }
+    }
+
     public function create()
     {
         //
@@ -35,7 +61,22 @@ class EventController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $image = ($request->event_image) ? $request->file('event_image')->store("/public/input/events") : null;
+        
+        $data = [
+            'name' => $request->event_name,
+            'description' => $request->event_description,
+            'image' => $image,
+            'youtube' => $request->event_youtube,
+            'date' => $request->event_date,
+            'location' => $request->event_location,
+        ];
+
+        Event::create($data)
+        ? Alert::success('Berhasil', 'Event telah berhasil ditambahkan!')
+        : Alert::error('Error', 'Event gagal ditambahkan!');
+
+        return redirect()->back();
     }
 
     /**
@@ -69,7 +110,29 @@ class EventController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $event = Event::findOrFail($id);
+        if($request->hasFile('edit_event_image')) {
+            if(Storage::exists($event->image) && !empty($event->image)) {
+                Storage::delete($event->image);
+            }
+
+            $edit_image = $request->file("edit_event_image")->store("/public/input/events");
+        }
+        $data = [
+            'name' => $request->edit_event_name ? $request->edit_event_name : $event->name,
+            'description' => $request->edit_event_description ? $request->edit_event_description : $event->description,
+            'image' => $request->hasFile('edit_event_image') ? $edit_image : $event->image,
+            'youtube' => $request->edit_event_youtube ? $request->edit_event_youtube : $event->youtube,
+            'date' => $request->edit_event_date ? $request->edit_event_date : $event->date,
+            'location' => $request->edit_event_location ? $request->edit_event_location : $event->location,
+           
+        ];
+
+        $event->update($data)
+        ? Alert::success('Berhasil', "Event telah berhasil diubah!")
+        : Alert::error('Error', "Event gagal diubah!");
+
+        return redirect()->back();
     }
 
     /**
@@ -80,6 +143,31 @@ class EventController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $event = Event::findOrFail($id);
+       
+        $event->delete()
+            ? Alert::success('Berhasil', "Event telah berhasil dihapus.")
+            : Alert::error('Error', "Event gagal dihapus!");
+
+        return redirect()->back();
+    }
+
+    public function destroyAll(Request $request)
+    {
+        if(empty($request->id)) {
+            Alert::info('Info', "Tidak ada event yang dipilih.");
+            return redirect()->back();
+        } else {
+            $event = $request->id;
+        
+            foreach($event as $events) {
+                Event::where('id', $events)->delete()
+                ? Alert::success('Berhasil', "Semua Event yang dipilih telah berhasil dihapus.")
+                : Alert::error('Error', "Event gagal dihapus!");
+            }
+               
+            return redirect()->back();
+        }
+        
     }
 }

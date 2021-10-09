@@ -4,7 +4,9 @@ namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-
+use App\Models\Banner;
+use Alert;
+use Storage;
 class BannerController extends Controller
 {
     /**
@@ -14,7 +16,8 @@ class BannerController extends Controller
      */
     public function index()
     {
-        return view('back.banner.index');
+        $data['banner'] = Banner::all();
+        return view('back.banner.index', $data);
     }
 
     /**
@@ -35,7 +38,18 @@ class BannerController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $image = $request->file('banner_image')->store('/public/input/banners');
+
+        $data = [
+            'image' => $image,
+            'url' => $request->banner_url
+        ];
+
+        Banner::create($data)
+        ? Alert::success('Berhasil', 'Banner telah berhasil ditambahkan!')
+        : Alert::error('Error', 'Banner gagal ditambahkan!');
+
+        return redirect()->back();
     }
 
     /**
@@ -69,7 +83,24 @@ class BannerController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $banner = Banner::findOrFail($id);
+        if($request->hasFile('edit_banner_image')) {
+            if(Storage::exists($banner->image) && !empty($banner->image)) {
+                Storage::delete($banner->image);
+            }
+
+            $edit_image = $request->file('edit_banner_image')->store('/public/input/banners');
+        }
+        $data = [
+            'image' => $request->hasFile('edit_banner_image') ? $edit_image : $banner->image, 
+            'url' => $request->edit_banner_url ? $request->edit_banner_url : $banner->url, 
+        ];
+
+        $banner->update($data)
+        ? Alert::success('Berhasil', "Banner telah berhasil diubah!")
+        : Alert::error('Error', "Banner gagal diubah!");
+
+        return redirect()->back();
     }
 
     /**
@@ -80,6 +111,27 @@ class BannerController extends Controller
      */
     public function destroy($id)
     {
-        //
+        $banner = Banner::findOrFail($id);
+       
+        $banner->delete()
+            ? Alert::success('Berhasil', "Banner telah berhasil dihapus.")
+            : Alert::error('Error', "Banner gagal dihapus!");
+
+        return redirect()->back();
+    }
+
+    public function destroyAll()
+    {
+        $banner = Banner::all();
+
+        foreach($banner as $banners) {
+            $banners->delete();
+        }
+
+        (count(Banner::all()) <= 1)
+        ? Alert::success('Berhasil', "Banner telah berhasil dihapus.")
+        : Alert::error('Error', "Banner gagal dihapus!");
+
+        return redirect()->back();
     }
 }
