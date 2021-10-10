@@ -12,6 +12,8 @@ use App\Http\Controllers\Back\DivisionController;
 use App\Http\Controllers\Back\SubDivisionController;
 use App\Http\Controllers\Back\EventController;
 use App\Http\Controllers\Back\BannerController;
+use App\Http\Controllers\Back\RoleController;
+use App\Http\Controllers\Back\PermissionController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -44,10 +46,14 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::resource('products', ProductController::class);
     Route::post('products/destroy-all', [ProductController::class, 'destroyAll'])->name('products.destroyAll');
     Route::post('products/check-product-name', [ProductController::class, 'checkProductName'])->name('checkProductName');
+    Route::post('product/search-product', [ProductController::class, 'productSearch'])->name('productSearch');
+    Route::post('product/pagination', [ProductController::class, 'productPagination'])->name('productPagination');
 
     Route::resource('projects', ProjectController::class);
     Route::post('projects/destroy-all', [ProjectController::class, 'destroyAll'])->name('projects.destroyAll');
     Route::post('projects/check-project-name', [ProjectController::class, 'checkProjectName'])->name('checkProjectName');
+    Route::post('project/search-project', [ProjectController::class, 'searchProject'])->name('searchProject');
+    Route::post('project/pagination', [ProjectController::class, 'projectPagination'])->name('projectPagination');
 
     Route::resource('teams', TeamController::class);
     Route::post('teams/destroy-all', [TeamController::class, 'destroyAll'])->name('teams.destroyAll');
@@ -63,9 +69,17 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::resource('events', EventController::class);
     Route::post('events/destroy-all', [EventController::class, 'destroyAll'])->name('events.destroyAll');
     Route::post('events/check-event-name', [EventController::class, 'checkEventName'])->name('checkEventName');
+    Route::post('event/search-event', [EventController::class, 'eventSearch'])->name('eventSearch');
+    Route::post('event/pagination', [EventController::class, 'eventPagination'])->name('eventPagination');
 
     Route::resource('banners', BannerController::class);
     Route::post('banners/destroy-all', [BannerController::class, 'destroyAll'])->name('banners.destroyAll');
+
+    Route::resource('roles', RoleController::class);
+    Route::post('roles/destroy-all', [RoleController::class, 'destroyAll'])->name('roles.destroyAll');
+
+    Route::resource('permissions', PermissionController::class);
+    Route::post('permissions/destroy-all', [PermissionController::class, 'destroyAll'])->name('permissions.destroyAll');
 });
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
     \UniSharp\LaravelFilemanager\Lfm::routes();

@@ -18,6 +18,7 @@ class ProjectController extends Controller
     public function index()
     {
         $data['project'] = Project::paginate(6);
+        $data['allProject'] = Project::all();
         return view('back.project.index', $data);
     }
 
@@ -26,6 +27,23 @@ class ProjectController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    function searchProject(Request $request)
+    {
+        $search_val = $request->search;
+        if($request->ajax()){
+            $project_result = Project::where('name','LIKE',"%{$search_val}%")->limit(6)->get();
+            return view('back.project.search', compact('project_result'))->render();
+        }
+    }
+
+    function projectPagination(Request $request)
+    {
+        if($request->ajax()) {
+            $project = Project::paginate(6);
+            return view('back.project.pagination', compact('project'))->render();
+        }
+    }
 
     public function checkProjectName(Request $request) 
     {

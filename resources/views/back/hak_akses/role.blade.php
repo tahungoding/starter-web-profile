@@ -1,5 +1,5 @@
 @extends('layouts.main')
-@section('title', 'Banner')
+@section('title', 'Role')
 @section('css')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css"
@@ -47,10 +47,10 @@
 @section('container')
 <section class="section">
   <div class="section-header">
-    <h1>Banner</h1>
+    <h1>Role</h1>
     <div class="section-header-breadcrumb">
       <div class="breadcrumb-item active"><a href="{{ route('dashboard.index') }}">Dashboard</a></div>
-      <div class="breadcrumb-item">Banner</div>
+      <div class="breadcrumb-item">Role</div>
     </div>
   </div>
 
@@ -61,9 +61,9 @@
         <div class="card">
           <div class="card-body">
             <div class="d-flex justify-content-between w-100">
-              <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#tambahBanner"><i
+              <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#tambahRole"><i
                   class="fas fa-plus-circle"></i></button>
-              @if (count($banner))
+              @if (count($role))
               <div class="d-flex justify-content-between">
                 <button class="btn btn-sm btn-danger" id="deleteAllButton" data-toggle="modal"
                   data-target="#deleteAllConfirm" style="margin-right: 20px;"><i class="fas fa-trash"></i></button>
@@ -78,12 +78,11 @@
             <br>
             <div class="card">
               <div class="card-body">
-                <table id="bannerTable" class="table table-striped" style="width:100%">
+                <table id="roleTable" class="table table-striped" style="width:100%">
                   <thead>
                     <tr>
                       <th>#</th>
-                      <th>Gambar</th>
-                      <th>Url</th>
+                      <th>Nama</th>
                       <th>Aksi</th>
                     </tr>
                   </thead>
@@ -91,22 +90,16 @@
                     @php
                     $increment = 1;
                     @endphp
-                    @foreach ($banner as $banners)
+                    @foreach ($role as $roles)
                     <tr>
                       <td>{{ $increment++ }}</td>
-                      <td>
-                        @if(!empty($banners->image) && Storage::exists($banners->image))
-                        <img src="{{ Storage::url($banners->image) }}" alt="Photo" width="100" height="80"
-                          style="object-fit: cover" class="rounded">
-                        @endif
-                      </td>
-                      <td>{{ $banners->url }}</td>
+                      <td>{{ $roles->name }}</td>
                       <td>
                         <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
-                          data-target="#editBanner{{$banners->id}}" onclick="validateEditBanner({{$banners}})"><i
+                          data-target="#editRole{{$roles->id}}" onclick="validateEditRole({{$roles}})"><i
                             class="far fa-edit"></i></button>
                         <button type="button" class="btn btn-sm btn-danger" data-toggle="modal"
-                          data-target="#deleteConfirm" onclick="deleteThisBanner({{$banners}})"><i
+                          data-target="#deleteConfirm" onclick="deleteThisRole({{$roles}})"><i
                             class="far fa-trash-alt"></i></button>
                       </td>
                     </tr>
@@ -124,28 +117,33 @@
 @endsection
 
 @section('modal')
-<div class="modal fade" tabindex="-1" role="dialog" id="tambahBanner">
+<div class="modal fade" tabindex="-1" role="dialog" id="tambahRole">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Tambah Banner</h5>
+        <h5 class="modal-title">Tambah Role</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form action="{{ route('banners.store') }}" method="post" id="tambahBannerForm" enctype="multipart/form-data">
+      <form action="{{ route('roles.store') }}" method="post" id="tambahRoleForm" enctype="multipart/form-data">
         @csrf
         <div class="modal-body">
           <div class="form-group">
-            <label for="image">Gambar</label>
-            <input type="file" class="form-control dropify" name="banner_image"
-              data-allowed-file-extensions="png jpg jpeg" data-show-remove="false">
-            <div id="errorImage">
-            </div>
+            <label for="name">Nama Role</label>
+            <input type="text" class="form-control" name="name" placeholder="Nama Role">
           </div>
           <div class="form-group">
-            <label for="url">Url</label>
-            <input type="text" class="form-control" name="banner_url" placeholder="Url">
+            <label for="permission">Permission</label>
+            @foreach ($permission as $item)
+            <div class="custom-control custom-checkbox">
+              <input class="custom-control-input" name="permission" type="checkbox" value="{{$item->name}}"
+                id="{{$item->name}}">
+                <label class="custom-control-label" for="{{$item->name}}">
+                {{$item->name}}
+              </label>
+            </div>
+            @endforeach
           </div>
         </div>
         <div class="modal-footer bg-whitesmoke br">
@@ -157,32 +155,25 @@
   </div>
 </div>
 
-@foreach ($banner as $banners)
-<div class="modal fade" tabindex="-1" role="dialog" id="editBanner{{$banners->id}}">
+@foreach ($role as $roles)
+<div class="modal fade" tabindex="-1" role="dialog" id="editRole{{$roles->id}}">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit Banner</h5>
+        <h5 class="modal-title">Edit Role</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form action="{{ route('banners.update', $banners->id) }}" method="post" id="editBannerForm{{$banners->id}}"
+      <form action="{{ route('roles.update', $roles->id) }}" method="post" id="editRoleForm{{$roles->id}}"
         enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div class="modal-body">
           <div class="form-group">
-            <label for="edit_banner_image">Gambar</label>
-            <input type="file" class="form-control dropify" name="edit_banner_image"
-              data-allowed-file-extensions="png jpg jpeg" data-default-file="@if(!empty($banners->image) &&
-                            Storage::exists($banners->image)){{ Storage::url($banners->image) }}@endif"
-              data-show-remove="false">
-          </div>
-          <div class="form-group">
-            <label for="edit_banner_url">Nama Lengkap</label>
-            <input type="text" class="form-control" name="edit_banner_url" id="edit_banner_url" placeholder="Nama"
-              value="{{ $banners->url }}">
+            <label for="edit_name">Nama Role</label>
+            <input type="text" class="form-control" name="edit_name" id="edit_name" placeholder="Nama Role"
+              value="{{ $roles->name }}">
           </div>
         </div>
         <div class="modal-footer bg-whitesmoke br">
@@ -204,11 +195,11 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form action="{{ route('banners.destroy', '') }}" method="post" id="deleteBannerForm">
+      <form action="{{ route('roles.destroy', '') }}" method="post" id="deleteRoleForm">
         @csrf
         @method('delete')
         <div class="modal-body">
-          Apakah anda yakin untuk <b>menghapus</b> banner ini ?
+          Apakah anda yakin untuk <b>menghapus</b> role ini ?
         </div>
         <div class="modal-footer bg-whitesmoke br">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
@@ -228,10 +219,10 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form action="{{ route('banners.destroyAll') }}" method="post" id="destroyAllForm">
+      <form action="{{ route('roles.destroyAll') }}" method="post" id="destroyAllForm">
         @csrf
         <div class="modal-body">
-          Apakah anda yakin untuk <b>menghapus semua</b> banner ?
+          Apakah anda yakin untuk <b>menghapus semua</b> role ?
         </div>
         <div class="modal-footer bg-whitesmoke br">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
@@ -256,7 +247,7 @@
   $('.dropify').dropify();
 
 $(document).ready(function() {
-  $('#bannerTable').DataTable( {
+  $('#roleTable').DataTable( {
         responsive: true,
         "searching": false
   });
@@ -272,30 +263,16 @@ $(document).ready(function() {
       }
   });
   
-  $("#tambahBannerForm").validate({
+  $("#tambahRoleForm").validate({
       rules: {
-          banner_image:{
-              required: true,
-          },
-          banner_url:{
+          name:{
               required: true,
           },
       },
       messages: {
-          banner_image:{
-                required: "Gambar harus di isi",
+        name:{
+                required: "Nama Role harus di isi",
           },
-          banner_url: {
-                  required: "Url harus di isi",
-          },
-      },
-      errorPlacement: function(error, element) {
-        if(element.attr("name") == "banner_image") {
-          error.appendTo("#errorImage");
-          // $(".dropify-wrapper").css('border-color', '#f1556c');
-        } else {
-          error.insertAfter(element);
-        }
       },
       submitHandler: function(form) {
         $("#tambahButton").prop('disabled', true);
@@ -303,16 +280,16 @@ $(document).ready(function() {
       }
   });
 });
-function validateEditBanner(data) {
-  $("#editBannerForm" + data.id).validate({
+function validateEditRole(data) {
+  $("#editRoleForm" + data.id).validate({
       rules: {
-          edit_banner_url:{
+          edit_name:{
               required: true,
           },
       },
       messages: {
-          edit_banner_url: {
-                  required: "Gambar harus di isi",
+          edit_name: {
+                  required: "Nama Role harus di isi",
           },
       },
       submitHandler: function(form) {
@@ -322,22 +299,21 @@ function validateEditBanner(data) {
   });
 }
 
-const deleteBanner = $("#deleteBannerForm").attr('action');
+const deleteRole = $("#deleteRoleForm").attr('action');
 
-function deleteThisBanner(data) {
-  $("#deleteBannerForm").attr('action', `${deleteBanner}/${data.id}`);
+function deleteThisRole(data) {
+  $("#deleteRoleForm").attr('action', `${deleteRole}/${data.id}`);
 }
 
 $("#deleteModalButton").click(function() {
     $(this).attr('disabled', true); 
-    $("#deleteBannerForm").submit();
+    $("#deleteRoleForm").submit();
 });
 
 $("#deleteAllModalButton").click(function() {
     $(this).attr('disabled', true); 
     $("#destroyAllForm").submit();
 });
-
 
 </script>
 @endsection

@@ -61,7 +61,8 @@
 
               @if (count($project))
               <div class="d-flex justify-content-between">
-                <input type="search" class="form-control" autocomplete="off" style="margin-right: 20px;">
+                <input type="search" id="projectSearch" class="form-control" autocomplete="off"
+                  style="margin-right: 20px;">
                 <input type="checkbox" id="checkAll" autocomplete="off" style="margin-right: 20px; display:none;">
                 <button class="btn btn-sm btn-danger" id="deleteAllButton" data-toggle="modal"
                   data-target="#deleteAllConfirm" style="margin-right: 20px; display:none;"><i
@@ -83,48 +84,15 @@
 
       </div>
     </div>
-    <form action="{{ route('projects.destroyAll') }}" method="post" id="destroyAllForm">
-      @csrf
-      <div class="row">
-        @foreach ($project as $projects)
-        <div class="col-md-4">
-          <div class="card" id="thisIs">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                @if (empty($projects->date_end))
-                <span class="badge badge-primary">Ongoing</span>
-                @else
-                <span class="badge badge-success">Completed</span>
-                @endif
-                <input type="checkbox" name='id[]' class="checkbox" value="{{ $projects->id }}" autocomplete="off"
-                  style="display: none;" disabled>
-              </div>
-              <br>
-              <h6>{{ Str::limit($projects->name, 30) }}</h6>
-              <img src="{{ Storage::url($projects->image) }}" alt="" class="img-fluid rounded mt-1"
-                style="width:100%; height:200px; object-fit:cover;">
-              <div class="btn-group text-center buttonGroup mt-3" id="buttonGroup">
-                <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
-                  data-target="#editProject{{ $projects->id }}"><i class="far fa-edit"></i></button>
-                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteConfirm"
-                  onclick="deleteThisProject({{$projects}})"><i class="far fa-trash-alt"></i></button>
-                <button type="button" class="btn btn-sm btn-dark" data-toggle="modal"
-                  data-target="#more{{ $projects->id }}">More</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        @endforeach
-      </div>
-    </form>
-    <div class="d-flex justify-content-center">
-      {{ $project->links('vendor.pagination.custom_pagination') }}
+    <div id="searchResult">
+
     </div>
+    <div id="projectData">
+      @include('back.project.pagination');
+    </div>
+    
   </div>
 </section>
-@endsection
-
-@section('modal')
 <div class="modal fade" tabindex="-1" role="dialog" id="tambahProject">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -176,7 +144,7 @@
   </div>
 </div>
 
-@foreach ($project as $projects)
+@foreach ($allProject as $projects)
 <div class="modal fade" tabindex="-1" role="dialog" id="editProject{{$projects->id}}">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -237,7 +205,7 @@
 </div>
 @endforeach
 
-@foreach ($project as $projects)
+@foreach ($allProject as $projects)
 <div class="modal fade" tabindex="-1" role="dialog" id="more{{$projects->id}}">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -284,7 +252,7 @@
         </div>
         <div class="modal-footer bg-whitesmoke br">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
-          <button type="submit" class="btn btn-primary" id="deleteModalButton">Ya, Hapus Semua</button>
+          <button type="submit" class="btn btn-primary" id="deleteModalButton">Ya, Hapus</button>
         </div>
       </form>
     </div>
@@ -311,11 +279,58 @@
   </div>
 </div>
 @endsection
+
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"
   integrity="sha512-8QFTrG0oeOiyWo/VM9Y8kgxdlCryqhIxVeRpWSezdRRAvarxVtwLnGroJgnVW9/XBRduxO/z1GblzPrMQoeuew=="
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script>
+  // 
+</script>
+<script>
+  $(document).ready(function() {
+
+  $(document).on('click', '.page-link', function(event) {
+      event.preventDefault();
+      var page = $(this).attr('href').split('page=')[1];
+      project_pagination(page);
+  });
+
+  function project_pagination(page)
+  {
+      var _token = $("input[name=_token]").val();
+      $.ajax({
+        url: "{{ route('projectPagination') }}",
+        method: "POST",
+        data: {_token:_token, page:page},
+        success: function(data) {
+            $("#projectData").html(data);
+        }
+      });
+  }
+
+  $("#projectSearch").keyup(function() {
+    var _token = $("input[name=_token]").val();
+    var search = $("#projectSearch").val();
+        $.ajax({
+            url:"{{ route('searchProject') }}",
+            method:"POST",
+            data:{_token:_token, search:search},
+            success:function(data) {
+                if(search == "") {
+                  $('#searchResult').html("");
+                  $("#projectData").css('display','block');
+                } else {
+                  $('#searchResult').html(data);
+                  $("#projectData").css('display','none');
+                }
+            }
+        });
+  });
+});
+</script>
+
 <script>
   $('.dropify').dropify();
 </script>

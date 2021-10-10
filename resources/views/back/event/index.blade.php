@@ -81,46 +81,14 @@
 
       </div>
     </div>
-    <form action="{{ route('events.destroyAll') }}" method="post" id="destroyAllForm">
-      @csrf
-      <div class="row">
-        @foreach ($event as $events)
-        <div class="col-md-4">
-          <div class="card" id="thisIs">
-            <div class="card-body">
-              <div class="d-flex justify-content-between">
-                <input type="checkbox" name='id[]' class="checkbox mb-3" value="{{ $events->id }}" autocomplete="off"
-                  style="display: none;" disabled>
-              </div>
-              <div class="d-flex justify-content-between">
-                <h6>{{ Str::limit($events->name, 30) }}</h6>
-                <h6>{{ $events->date }}</h6>
-              </div>
-              <img src="{{ Storage::url($events->image) }}" alt="" class="img-fluid rounded mt-1"
-                style="width:100%; height:200px; object-fit:cover;">
-              <div class="btn-group text-center buttonGroup mt-3" id="buttonGroup">
-                <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
-                  data-target="#editEvent{{ $events->id }}" onclick="validateEvent({{ $events->id }})"><i
-                    class="far fa-edit"></i></button>
-                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteConfirm"
-                  onclick="deleteThisEvent({{$events}})"><i class="far fa-trash-alt"></i></button>
-                <button type="button" class="btn btn-sm btn-dark" data-toggle="modal"
-                  data-target="#more{{ $events->id }}">More</button>
-              </div>
-            </div>
-          </div>
-        </div>
-        @endforeach
-      </div>
-    </form>
-    <div class="d-flex justify-content-center">
-      {{ $event->links('vendor.pagination.custom_pagination') }}
+    <div id="searchResult">
+
+    </div>
+    <div id="eventData">
+      @include('back.event.pagination')
     </div>
   </div>
 </section>
-@endsection
-
-@section('modal')
 <div class="modal fade" tabindex="-1" role="dialog" id="tambahEvent">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -171,7 +139,7 @@
   </div>
 </div>
 
-@foreach ($event as $events)
+@foreach ($allEvent as $events)
 <div class="modal fade" tabindex="-1" role="dialog" id="editEvent{{$events->id}}">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -232,7 +200,7 @@
 </div>
 @endforeach
 
-@foreach ($event as $events)
+@foreach ($allEvent as $events)
 <div class="modal fade" tabindex="-1" role="dialog" id="more{{$events->id}}">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -243,9 +211,11 @@
         </button>
       </div>
       <div class="modal-body">
+
+        <p><b>Tanggal</b> : {{ $events->date }}</p>
+        <p><b>Lokasi</b> : {{ $events->location }}</p>
         <p>{{ $events->name }}</p>
-        <p>Tanggal : {{ $events->date }}</p>
-        <p>Lokasi : {{ $events->location }}</p>
+       
         @if(!empty($events->image) && Storage::exists($events->image))
         <img src="{{ Storage::url($events->image) }}" alt="" class="img-fluid rounded mt-1"
           style="width:100%; height:200px; object-fit:cover;">
@@ -253,7 +223,6 @@
         <br><br>
         <p>{{ $events->description }}</p>
         @if(isset($events->youtube))
-        <label for="">Youtube</label>
         <input type="text" class="form-control" value="{{ $events->youtube }}" readonly>
         @endif
       </div>
@@ -319,6 +288,47 @@
 </script>
 <script>
   $(document).ready(function() {
+    $(document).on('click', '.page-link', function(event) {
+        event.preventDefault();
+        var page = $(this).attr('href').split('page=')[1];
+        event_pagination(page);
+    });
+  
+    function event_pagination(page)
+    {
+      var _token = $("input[name=_token]").val();
+      $.ajax({
+        url: "{{ route('eventPagination') }}",
+        method: "POST",
+        data: {_token:_token, page:page},
+        success: function(data) {
+            $("#eventData").html(data);
+        }
+      });
+    }
+  
+    $("#eventSearch").keyup(function() {
+      var _token = $("input[name=_token]").val();
+      var search = $("#eventSearch").val();
+        $.ajax({
+            url:"{{ route('eventSearch') }}",
+            method:"POST",
+            data:{_token:_token, search:search},
+            success:function(data) {
+                if(search == "") {
+                    $('#searchResult').html("");
+                    $("#eventData").css('display','block');
+                } else {
+                    $('#searchResult').html(data);
+                    $("#eventData").css('display','none');
+                }
+            }
+        });
+     });
+  });
+  </script>
+<script>
+  $(document).ready(function() {
 
   $.ajaxSetup({
       headers: {
@@ -366,7 +376,6 @@
                   required: "Lokasi harus di isi",
           }
       },
-    
       errorPlacement: function(error, element) {
         if(element.attr("name") == "event_image") {
           error.appendTo("#errorImage");

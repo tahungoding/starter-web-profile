@@ -33,7 +33,7 @@
 
   #buttonGroup {
     display: block;
-  } 
+  }
 </style>
 @endsection
 @section('container')
@@ -50,16 +50,13 @@
     <div class="row">
       <div class="col-12 col-md-6 col-lg-12">
         <div class="card">
-
-        </div>
-        <div class="card">
           <div class="card-header">
             <div class="d-flex justify-content-between w-100">
               <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#tambahProduct"><i
                   class="fas fa-plus-circle"></i></button>
               @if (count($product))
               <div class="d-flex justify-content-between">
-                <input type="search" class="form-control" autocomplete="off" style="margin-right: 20px;">
+                <input type="search" class="form-control" id="productSearch" autocomplete="off" style="margin-right: 20px;">
                 <input type="checkbox" id="checkAll" autocomplete="off" style="margin-right: 20px; display:none;">
                 <button class="btn btn-sm btn-danger" id="deleteAllButton" data-toggle="modal"
                   data-target="#deleteAllConfirm" style="margin-right: 20px; display:none;"><i
@@ -76,45 +73,19 @@
               </div>
               @endif
             </div>
-          </div>  
-        </div>
-
-      </div>
-    </div>
-    <form action="{{ route('products.destroyAll') }}" method="post" id="destroyAllForm">
-      @csrf
-      <div class="row">
-        @foreach ($product as $products)
-        <div class="col-md-4">
-         
-          <div class="card" id="thisIs">
-            <div class="card-body">
-                <input type="checkbox" name='id[]' class="checkbox mb-3" value="{{ $products->id }}" autocomplete="off"
-                  style="display: none;" disabled>
-              <h6>{{ Str::limit($products->name, 30) }}</h6>
-              <img src="{{ Storage::url($products->image) }}" class="img-fluid rounded mt-1"
-                style="width:100%; height:200px; object-fit:cover;">
-              <div class="btn-group text-center buttonGroup mt-3" id="buttonGroup">
-                <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
-                  data-target="#editProduct{{ $products->id }}"><i class="far fa-edit"></i></button>
-                <button type="button" class="btn btn-sm btn-danger" data-toggle="modal" data-target="#deleteConfirm"
-                  onclick="deleteThisProduct({{$products}})"><i class="far fa-trash-alt"></i></button>
-                <button type="button" class="btn btn-sm btn-dark" data-toggle="modal" data-target="#more{{ $products->id }}">More</button>
-              </div>
-            </div>
           </div>
         </div>
-        @endforeach
       </div>
-    </form>
-    <div class="d-flex justify-content-center">
-      {{ $product->links('vendor.pagination.custom_pagination') }}
+    </div>
+    <div id="searchResult">
+
+    </div>
+    <div id="productData">
+      @include('back.product.pagination');
     </div>
   </div>
 </section>
-@endsection
 
-@section('modal')
 <div class="modal fade" tabindex="-1" role="dialog" id="tambahProduct">
   <div class="modal-dialog " role="document">
     <div class="modal-content">
@@ -133,7 +104,8 @@
           </div>
           <div class="form-group">
             <label for="description">Deskripsi</label>
-            <textarea class="form-control" name="product_description" placeholder="Deskripsi" style="height: 100%;"></textarea>
+            <textarea class="form-control" name="product_description" placeholder="Deskripsi"
+              style="height: 100%;"></textarea>
           </div>
           <div class="form-group">
             <label for="youtube">Youtube</label>
@@ -156,7 +128,7 @@
   </div>
 </div>
 
-@foreach ($product as $products)
+@foreach ($allProduct as $products)
 <div class="modal fade" tabindex="-1" role="dialog" id="editProduct{{$products->id}}">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -179,7 +151,8 @@
           </div>
           <div class="form-group">
             <label for="description">Deskripsi</label>
-            <textarea class="form-control" name="edit_product_description" placeholder="Deskripsi" style="height: 100%;">{{ $products->description }}</textarea>
+            <textarea class="form-control" name="edit_product_description" placeholder="Deskripsi"
+              style="height: 100%;">{{ $products->description }}</textarea>
           </div>
           <div class="form-group">
             <label for="youtube">Youtube</label>
@@ -204,7 +177,7 @@
 </div>
 @endforeach
 
-@foreach ($product as $products)
+@foreach ($allProduct as $products)
 <div class="modal fade" tabindex="-1" role="dialog" id="more{{$products->id}}">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
@@ -217,13 +190,13 @@
       <div class="modal-body">
         <p>{{ $products->name }}</p>
         @if(!empty($products->image) && Storage::exists($products->image))
-          <img src="{{ Storage::url($products->image) }}" alt="" class="img-fluid rounded mt-1"
-                style="width:100%; height:200px; object-fit:cover;">
+        <img src="{{ Storage::url($products->image) }}" alt="" class="img-fluid rounded mt-1"
+          style="width:100%; height:200px; object-fit:cover;">
         @endif
         <br><br>
         <p>{{ $products->description }}</p>
         @if (isset($products->youtube))
-          <input type="text" class="form-control" value="{{ $products->youtube }}" readonly>
+        <input type="text" class="form-control" value="{{ $products->youtube }}" readonly>
         @endif
       </div>
       <div class="modal-footer bg-whitesmoke br">
@@ -231,7 +204,7 @@
       </div>
     </div>
   </div>
-</div>    
+</div>
 @endforeach
 
 <div class="modal fade" tabindex="-1" role="dialog" id="deleteConfirm">
@@ -278,6 +251,7 @@
   </div>
 </div>
 @endsection
+
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"
@@ -285,6 +259,47 @@
   crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
   $('.dropify').dropify();
+</script>
+<script>
+$(document).ready(function() {
+  $(document).on('click', '.page-link', function(event) {
+      event.preventDefault();
+      var page = $(this).attr('href').split('page=')[1];
+      product_pagination(page);
+  });
+
+  function product_pagination(page)
+  {
+    var _token = $("input[name=_token]").val();
+    $.ajax({
+      url: "{{ route('productPagination') }}",
+      method: "POST",
+      data: {_token:_token, page:page},
+      success: function(data) {
+          $("#productData").html(data);
+      }
+    });
+  }
+
+  $("#productSearch").keyup(function() {
+    var _token = $("input[name=_token]").val();
+    var search = $("#productSearch").val();
+      $.ajax({
+          url:"{{ route('productSearch') }}",
+          method:"POST",
+          data:{_token:_token, search:search},
+          success:function(data) {
+              if(search == "") {
+                  $('#searchResult').html("");
+                  $("#productData").css('display','block');
+              } else {
+                  $('#searchResult').html(data);
+                  $("#productData").css('display','none');
+              }
+          }
+      });
+   });
+});
 </script>
 <script>
   $(document).ready(function() {

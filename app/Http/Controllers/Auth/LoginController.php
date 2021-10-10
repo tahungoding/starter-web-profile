@@ -18,7 +18,7 @@ class LoginController extends Controller
      */
     public function index()
     {
-        return view('back.login.index');
+        return view('auth.login.index');
     }
 
     /**

@@ -18,6 +18,7 @@ class ProductController extends Controller
     public function index()
     {
         $data['product'] = Product::paginate(6);
+        $data['allProduct'] = Product::all();
         return view('back.product.index', $data);
     }
 
@@ -26,6 +27,23 @@ class ProductController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    function productSearch(Request $request)
+    {
+        $search_val = $request->search;
+        if($request->ajax()){
+            $product_result = Product::where('name','LIKE',"%{$search_val}%")->limit(6)->get();
+            return view('back.product.search', compact('product_result'))->render();
+        }
+    }
+
+    function productPagination(Request $request)
+    {
+        if($request->ajax()) {
+            $product = Product::paginate(6);
+            return view('back.product.pagination', compact('product'))->render();
+        }
+    }
 
     public function checkProductName(Request $request) 
     {

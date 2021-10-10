@@ -84,7 +84,13 @@
                                 </div>
                                 <div class="form-group col-md-6 col-12">
                                     <label>Password</label>
-                                    <input type="password" class="form-control" name="password">
+                                    <div class="input-group" id="showOrHide">
+                                        <input type="password" class="form-control" name="password">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" type="button"><i class="fa fa-eye-slash" aria-hidden="true"></i></button>
+                                        </div>
+                                    </div>
+                                    <div id="errorPassword"></div>
                                 </div>
 
                                 <div class="form-group col-md-6 col-12">
@@ -201,10 +207,34 @@
                   required: "Jenis Kelamin harus di isi.",
             },
       },
+      errorPlacement: function(error, element) {
+        if(element.attr("name") == "password") {
+          error.appendTo("#errorPassword");
+          // $(".dropify-wrapper").css('border-color', '#f1556c');
+        } else {
+          error.insertAfter(element);
+        }
+      },
       submitHandler: function(form) {
         $("#editProfileButton").prop('disabled', true);
             form.submit();
       }
+  });
+
+
+  $(document).ready(function() {
+      $("#showOrHide button").on('click', function(event) {
+          event.preventDefault();
+          if($("#showOrHide input").attr("type") == "text") {
+            $('#showOrHide input').attr('type', 'password');
+            $('#showOrHide i').addClass( "fa-eye-slash" );
+            $('#showOrHide i').removeClass( "fa-eye" );
+          } else if($('#showOrHide input').attr("type") == "password"){
+            $('#showOrHide input').attr('type', 'text');
+            $('#showOrHide i').removeClass( "fa-eye-slash" );
+            $('#showOrHide i').addClass( "fa-eye" );
+        }
+      });
   });
 </script>
 @endsection

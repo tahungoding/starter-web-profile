@@ -18,6 +18,7 @@ class EventController extends Controller
     public function index()
     {
         $data['event'] = Event::paginate(6);
+        $data['allEvent'] = Event::all();
         return view('back.event.index', $data);
     }
 
@@ -26,6 +27,23 @@ class EventController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    function eventSearch(Request $request)
+    {
+        $search_val = $request->search;
+        if($request->ajax()){
+            $event_result = Event::where('name','LIKE',"%{$search_val}%")->limit(6)->get();
+            return view('back.event.search', compact('event_result'))->render();
+        }
+    }
+
+    function eventPagination(Request $request)
+    {
+        if($request->ajax()) {
+            $event = Event::paginate(6);
+            return view('back.event.pagination', compact('event'))->render();
+        }
+    }
 
     public function checkEventName(Request $request) 
     {

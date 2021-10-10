@@ -77,8 +77,8 @@
               <li class="nav-item dropdown">
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-users-cog"></i><span>Hak Akses</span></a>
                 <ul class="dropdown-menu">
-                  <li><a class="nav-link" href="index-0.html">Role</a></li>
-                  <li class="active"><a class="nav-link" href="index.html">Permission</a></li>
+                  <li class="{{ request()->routeIs('roles.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('roles.index') }}">Role</a></li>
+                  <li class="{{ request()->routeIs('permissions.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('permissions.index') }}">Permission</a></li>
                 </ul>
               </li>
             </ul>
@@ -87,11 +87,9 @@
 
       <!-- Main Content -->
       <div class="main-content">
-        <section class="section">
           @yield('container')
-        </section>
+          @yield('modal')
       </div>
-      @yield('modal')
       <footer class="main-footer">
         <div class="footer-left">
           Copyright &copy; 2021 <div class="bullet"></div> <a href="https://tahungoding.com/">TAHUNGODING</a>
