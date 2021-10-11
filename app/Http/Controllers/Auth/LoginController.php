@@ -64,7 +64,7 @@ class LoginController extends Controller
                 Storage::delete($user->photo);
             }
 
-            $photo = $request->file("photo")->store("/public/input/userss");
+            $photo = $request->file("photo")->store("/public/input/users");
         }
         $data = [
             'fullname' => $request->fullname ? $request->fullname : $user->fullname,

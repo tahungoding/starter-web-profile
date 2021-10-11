@@ -77,9 +77,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
     Route::resource('roles', RoleController::class);
     Route::post('roles/destroy-all', [RoleController::class, 'destroyAll'])->name('roles.destroyAll');
+    Route::post('roles/check-roles-name', [RoleController::class, 'checkRoleName'])->name('checkRoleName');
 
     Route::resource('permissions', PermissionController::class);
     Route::post('permissions/destroy-all', [PermissionController::class, 'destroyAll'])->name('permissions.destroyAll');
+    Route::post('permissions/check-permission-name', [PermissionController::class, 'checkPermissionName'])->name('checkPermissionName');
+
 });
 Route::group(['prefix' => 'laravel-filemanager', 'middleware' => ['web', 'auth']], function () {
     \UniSharp\LaravelFilemanager\Lfm::routes();

@@ -157,6 +157,7 @@
         enctype="multipart/form-data">
         @csrf
         @method('PUT')
+        <input type="hidden" id="checkPermissionName{{ $permissions->id }}" value="{{ $permissions->name }}">
         <div class="modal-body">
           <div class="form-group">
             <label for="edit_name">Nama Permission</label>
@@ -255,11 +256,16 @@ $(document).ready(function() {
       rules: {
           name:{
               required: true,
+              remote: {
+                    url: "{{ route('checkPermissionName') }}",
+                    type: "post",
+              }
           },
       },
       messages: {
         name:{
                 required: "Nama Permission harus di isi",
+                remote: "Role sudah tersedia"
           },
       },
       submitHandler: function(form) {
@@ -273,11 +279,22 @@ function validateEditPermission(data) {
       rules: {
           edit_name:{
               required: true,
+              remote: {
+                        param: {
+                              url: "{{ route('checkPermissionName') }}",
+                              type: "post",
+                        },
+                        depends: function(element) {
+                          // compare name in form to hidden field
+                          return ($(element).val() !== $('#checkPermissionName' + data.id).val());
+                        },
+                }
           },
       },
       messages: {
           edit_name: {
                   required: "Nama Permission harus di isi",
+                  remote: "Role sudah tersedia"
           },
       },
       submitHandler: function(form) {

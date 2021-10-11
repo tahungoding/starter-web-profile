@@ -55,7 +55,6 @@
   </div>
 
   <div class="section-body">
-
     <div class="row">
       <div class="col-sm-12">
         <div class="card">
@@ -139,7 +138,7 @@
             <div class="custom-control custom-checkbox">
               <input class="custom-control-input" name="permission" type="checkbox" value="{{$item->name}}"
                 id="{{$item->name}}">
-                <label class="custom-control-label" for="{{$item->name}}">
+              <label class="custom-control-label" for="{{$item->name}}">
                 {{$item->name}}
               </label>
             </div>
@@ -169,11 +168,24 @@
         enctype="multipart/form-data">
         @csrf
         @method('PUT')
+        <input type="hidden" id="checkRoleName{{ $roles->id }}" value="{{ $roles->name }}">
         <div class="modal-body">
           <div class="form-group">
             <label for="edit_name">Nama Role</label>
             <input type="text" class="form-control" name="edit_name" id="edit_name" placeholder="Nama Role"
               value="{{ $roles->name }}">
+          </div>
+          <div class="form-group">
+            <label for="permission">Permission</label>
+            @foreach ($permission as $item)
+            <div class="custom-control custom-checkbox">
+              <input class="custom-control-input" name="edit_permission" type="checkbox" value="{{$item->name}}"
+                id="{{$item->name}}">
+              <label class="custom-control-label" for="{{$item->name}}">
+                {{$item->name}}
+              </label>
+            </div>
+            @endforeach
           </div>
         </div>
         <div class="modal-footer bg-whitesmoke br">
@@ -267,11 +279,16 @@ $(document).ready(function() {
       rules: {
           name:{
               required: true,
-          },
+              remote: {
+                    url: "{{ route('checkRoleName') }}",
+                    type: "post",
+              }
+          }
       },
       messages: {
         name:{
                 required: "Nama Role harus di isi",
+                remote: "Role sudah tersedia",
           },
       },
       submitHandler: function(form) {
@@ -285,11 +302,22 @@ function validateEditRole(data) {
       rules: {
           edit_name:{
               required: true,
-          },
+              remote: {
+                        param: {
+                              url: "{{ route('checkRoleName') }}",
+                              type: "post",
+                        },
+                        depends: function(element) {
+                          // compare name in form to hidden field
+                          return ($(element).val() !== $('#checkRoleName' + data.id).val());
+                        },
+                }
+          }
       },
       messages: {
           edit_name: {
                   required: "Nama Role harus di isi",
+                  remote: "Role sudah tersedia",
           },
       },
       submitHandler: function(form) {

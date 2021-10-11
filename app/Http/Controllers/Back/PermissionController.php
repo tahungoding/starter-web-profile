@@ -25,6 +25,28 @@ class PermissionController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function checkPermissionName(Request $request) 
+    {
+        if($request->Input('name')){
+            $name = Permission::where('name',$request->Input('name'))->first();
+            if($name){
+                return 'false';
+            }else{
+                return  'true';
+            }
+        }
+
+        if($request->Input('edit_name')){
+            $edit_name = Permission::where('name',$request->Input('edit_name'))->first();
+            if($edit_name){
+                return 'false';
+            }else{
+                return  'true';
+            }
+        }
+    }
+
     public function create()
     {
         //
@@ -38,9 +60,7 @@ class PermissionController extends Controller
      */
     public function store(Request $request)
     {
-        $new = Permission::create(['name' => $request->name, 'guard_name' => 'web']);
-
-        $new->syncPermissions($request->permission)
+        $new = Permission::create(['name' => $request->name, 'guard_name' => 'web'])
         ? Alert::success('Berhasil', 'Permission telah berhasil ditambahkan!')
         : Alert::error('Error', 'Permission gagal ditambahkan!');
 
@@ -78,7 +98,13 @@ class PermissionController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $update = Permission::findOrFail($id);
+        $update->name = $request->edit_name;
+        $update->save()
+        ? Alert::success('Berhasil', "Permission telah berhasil diubah.")
+        : Alert::error('Error', "Permission gagal diubah!");
+
+        return redirect()->back();
     }
 
     /**

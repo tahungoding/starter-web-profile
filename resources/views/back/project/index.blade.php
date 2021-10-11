@@ -34,6 +34,16 @@
   #buttonGroup {
     display: block;
   }
+
+  @media screen and (max-width: 455px) {
+    .desktop-search {
+      display: none;
+    }
+
+    .mobile-search-card {
+      display: block !important;
+    }
+  }
 </style>
 @endsection
 @section('container')
@@ -48,20 +58,15 @@
 
   <div class="section-body">
     <div class="row">
-      <div class="col-12 col-md-6 col-lg-12">
-        <div class="card">
-
-        </div>
+      <div class="col-12 col-md-12 col-lg-12">
         <div class="card">
           <div class="card-header">
             <div class="d-flex justify-content-between w-100">
               <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#tambahProject"><i
                   class="fas fa-plus-circle"></i></button>
-
-
               @if (count($project))
               <div class="d-flex justify-content-between">
-                <input type="search" id="projectSearch" class="form-control" autocomplete="off"
+                <input type="search" class="form-control desktop-search" id="projectSearch" placeholder="Cari Project..." autocomplete="off"
                   style="margin-right: 20px;">
                 <input type="checkbox" id="checkAll" autocomplete="off" style="margin-right: 20px; display:none;">
                 <button class="btn btn-sm btn-danger" id="deleteAllButton" data-toggle="modal"
@@ -81,7 +86,13 @@
             </div>
           </div>
         </div>
-
+        @if (count($project))
+        <div class="card mobile-search-card" style="display: none">
+          <div class="card-header">
+            <input type="search" class="form-control mobile-search" id="mobileProjectSearch" placeholder="Cari Project..." autocomplete="off">
+          </div>
+        </div>
+        @endif
       </div>
     </div>
     <div id="searchResult">
@@ -310,9 +321,15 @@
       });
   }
 
-  $("#projectSearch").keyup(function() {
+  $("#mobileProjectSearch, #projectSearch").keyup(function() {
     var _token = $("input[name=_token]").val();
-    var search = $("#projectSearch").val();
+    var originSearch = $("#projectSearch").val();
+    var mobileOriginSearch = $("#mobileProjectSearch").val();
+    if(originSearch == "") {
+      var search = $("#mobileProjectSearch").val();
+    } else {
+      var search = $("#projectSearch").val();
+    }
         $.ajax({
             url:"{{ route('searchProject') }}",
             method:"POST",

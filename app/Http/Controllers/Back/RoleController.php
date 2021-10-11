@@ -28,6 +28,28 @@ class RoleController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function checkRoleName(Request $request) 
+    {
+        if($request->Input('role')){
+            $role = Role::where('name',$request->Input('role'))->first();
+            if($role){
+                return 'false';
+            }else{
+                return  'true';
+            }
+        }
+
+        if($request->Input('edit_name')){
+            $edit_name = Role::where('name',$request->Input('edit_name'))->first();
+            if($edit_name){
+                return 'false';
+            }else{
+                return  'true';
+            }
+        }
+    }
+
     public function create()
     {
         //
@@ -69,8 +91,7 @@ class RoleController extends Controller
      */
     public function edit($id)
     {
-        $update = Role::findOrFail($id);
-        $update->name = $request->name;
+        
     }
 
     /**
@@ -82,7 +103,14 @@ class RoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $update = Role::findOrFail($id);
+        $update->name = $request->edit_name;
+        $update->syncPermissions($request->edit_permission);
+        $update->save()
+        ? Alert::success('Berhasil', 'Role telah berhasil diubah!')
+        : Alert::error('Error', 'Role gagal diubah!');
+
+        return redirect()->back();
     }
 
     /**

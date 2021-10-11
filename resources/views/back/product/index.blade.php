@@ -34,6 +34,16 @@
   #buttonGroup {
     display: block;
   }
+
+  @media screen and (max-width: 455px) {
+    .desktop-search {
+      display: none;
+    }
+
+    .mobile-search-card {
+      display: block !important;
+    }
+  }
 </style>
 @endsection
 @section('container')
@@ -48,7 +58,7 @@
 
   <div class="section-body">
     <div class="row">
-      <div class="col-12 col-md-6 col-lg-12">
+      <div class="col-12 col-md-12 col-lg-12">
         <div class="card">
           <div class="card-header">
             <div class="d-flex justify-content-between w-100">
@@ -56,7 +66,8 @@
                   class="fas fa-plus-circle"></i></button>
               @if (count($product))
               <div class="d-flex justify-content-between">
-                <input type="search" class="form-control" id="productSearch" autocomplete="off" style="margin-right: 20px;">
+                <input type="search" class="form-control desktop-search" id="productSearch" placeholder="Cari Produk..."
+                  autocomplete="off" style="margin-right: 20px;">
                 <input type="checkbox" id="checkAll" autocomplete="off" style="margin-right: 20px; display:none;">
                 <button class="btn btn-sm btn-danger" id="deleteAllButton" data-toggle="modal"
                   data-target="#deleteAllConfirm" style="margin-right: 20px; display:none;"><i
@@ -75,13 +86,21 @@
             </div>
           </div>
         </div>
+        @if (count($product))
+        <div class="card mobile-search-card" style="display: none">
+          <div class="card-header">
+            <input type="search" class="form-control mobile-search" id="mobileProductSearch"
+              placeholder="Cari Produk..." autocomplete="off">
+          </div>
+        </div>
+        @endif
       </div>
     </div>
     <div id="searchResult">
 
     </div>
     <div id="productData">
-      @include('back.product.pagination');
+      @include('back.product.pagination')
     </div>
   </div>
 </section>
@@ -261,7 +280,7 @@
   $('.dropify').dropify();
 </script>
 <script>
-$(document).ready(function() {
+  $(document).ready(function() {
   $(document).on('click', '.page-link', function(event) {
       event.preventDefault();
       var page = $(this).attr('href').split('page=')[1];
@@ -281,9 +300,15 @@ $(document).ready(function() {
     });
   }
 
-  $("#productSearch").keyup(function() {
+  $("#mobileProductSearch, #productSearch").keyup(function() {
     var _token = $("input[name=_token]").val();
-    var search = $("#productSearch").val();
+    var originSearch = $("#productSearch").val();
+    var mobileOriginSearch = $("#mobileProductSearch").val();
+    if(originSearch == "") {
+      var search = $("#mobileProductSearch").val();
+    } else {
+      var search = $("#productSearch").val();
+    }
       $.ajax({
           url:"{{ route('productSearch') }}",
           method:"POST",

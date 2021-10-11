@@ -34,6 +34,16 @@
   #buttonGroup {
     display: block;
   }
+
+  @media screen and (max-width: 455px) {
+    .desktop-search {
+      display: none;
+    }
+
+    .mobile-search-card {
+      display: block !important;
+    }
+  }
 </style>
 @endsection
 @section('container')
@@ -50,16 +60,13 @@
     <div class="row">
       <div class="col-12 col-md-6 col-lg-12">
         <div class="card">
-
-        </div>
-        <div class="card">
           <div class="card-header">
             <div class="d-flex justify-content-between w-100">
               <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#tambahEvent"><i
                   class="fas fa-plus-circle"></i></button>
               @if (count($event))
               <div class="d-flex justify-content-between">
-                <input type="search" class="form-control" autocomplete="off" style="margin-right: 20px;">
+                <input type="search" class="form-control desktop-search" id="eventSearch" placeholder="Cari Event..." autocomplete="off" style="margin-right: 20px;">
                 <input type="checkbox" id="checkAll" autocomplete="off" style="margin-right: 20px; display:none;">
                 <button class="btn btn-sm btn-danger" id="deleteAllButton" data-toggle="modal"
                   data-target="#deleteAllConfirm" style="margin-right: 20px; display:none;"><i
@@ -78,7 +85,13 @@
             </div>
           </div>
         </div>
-
+        @if (count($event))
+        <div class="card mobile-search-card" style="display: none">
+          <div class="card-header">
+            <input type="search" class="form-control mobile-search" id="mobileEventSearch" placeholder="Cari Event..." autocomplete="off">
+          </div>
+        </div>
+        @endif
       </div>
     </div>
     <div id="searchResult">
@@ -215,7 +228,7 @@
         <p><b>Tanggal</b> : {{ $events->date }}</p>
         <p><b>Lokasi</b> : {{ $events->location }}</p>
         <p>{{ $events->name }}</p>
-       
+
         @if(!empty($events->image) && Storage::exists($events->image))
         <img src="{{ Storage::url($events->image) }}" alt="" class="img-fluid rounded mt-1"
           style="width:100%; height:200px; object-fit:cover;">
@@ -307,9 +320,15 @@
       });
     }
   
-    $("#eventSearch").keyup(function() {
+    $("#mobileEventSearch, #eventSearch").keyup(function() {
       var _token = $("input[name=_token]").val();
-      var search = $("#eventSearch").val();
+      var originSearch = $("#eventSearch").val();
+      var mobileOriginSearch = $("#mobileEventSearch").val();
+      if(originSearch == "") {
+        var search = $("#mobileEventSearch").val();
+      } else {
+        var search = $("#eventSearch").val();
+      }
         $.ajax({
             url:"{{ route('eventSearch') }}",
             method:"POST",
@@ -326,7 +345,7 @@
         });
      });
   });
-  </script>
+</script>
 <script>
   $(document).ready(function() {
 
