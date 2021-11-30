@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Back;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Project;
+use App\Models\Web;
 use Storage;
 use Alert;
 
@@ -19,6 +20,7 @@ class ProjectController extends Controller
     {
         $data['project'] = Project::paginate(6);
         $data['allProject'] = Project::all();
+        $data['web'] = Web::all();
         return view('back.project.index', $data);
     }
 

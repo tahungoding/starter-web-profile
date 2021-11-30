@@ -1,4 +1,4 @@
-@extends('layouts.main')
+@extends('layouts.main', ['web' => $web])
 @section('title', 'Tahungoding')
 @section('container')
 <section class="section">

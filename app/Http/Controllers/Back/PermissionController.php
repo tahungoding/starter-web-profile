@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Back;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Permission;
+use App\Models\Web;
 use Alert;
 
 class PermissionController extends Controller
@@ -17,6 +18,7 @@ class PermissionController extends Controller
     public function index()
     {
         $data['permission'] = Permission::all();
+        $data['web'] = Web::all();
         return view('back.hak_akses.permission', $data);
     }
 

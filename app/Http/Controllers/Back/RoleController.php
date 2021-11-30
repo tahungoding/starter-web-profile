@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use App\Models\Role_has_permission;
+use App\Models\Web;
 use Alert;
 
 class RoleController extends Controller
@@ -20,6 +21,7 @@ class RoleController extends Controller
     {
         $data['role'] = Role::all();
         $data['permission'] = Permission::all();
+        $data['web'] = Web::all();
         return view('back.hak_akses.role', $data);
     }
 

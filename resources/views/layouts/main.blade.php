@@ -20,13 +20,40 @@
   <link rel="stylesheet" href="{{ asset('assets/css/style.css') }}">
   <link rel="stylesheet" href="{{ asset('assets/css/components.css') }}">
 
+  @if(count($web))
+  @foreach ($web as $webs)
+      @php 
+          $primary_color = $webs->primary_color 
+      @endphp
+  @endforeach
+  @else
+    @php 
+        $primary_color = "#6777ef";
+    @endphp
+  @endif
+  <style>
+    a {
+        color: {{$primary_color}};
+    }
+    .section .section-title::before {
+        background-color: {{$primary_color}};
+    }
+
+    .card .card-header h4 {
+        color: {{$primary_color}};
+    }
+
+    #searchResultMenu {
+      display: none;
+    }
+  </style>
   @yield('css')
 </head>
 
 <body>
   <div id="app">
     <div class="main-wrapper">
-      <div class="navbar-bg"></div>
+      <div class="navbar-bg" style="background-color: @if(isset($primary_color)) {{$primary_color}} @else #6777ef @endif"></div>
       <nav class="navbar navbar-expand-lg main-navbar">
         <form class="form-inline mr-auto">
           <ul class="navbar-nav mr-3">
@@ -92,7 +119,7 @@
       </div>
       <footer class="main-footer">
         <div class="footer-left">
-          Copyright &copy; 2021 <div class="bullet"></div> <a href="https://tahungoding.com/">TAHUNGODING</a>
+          Copyright &copy; 2021 <div class="bullet"></div> <a href="https://tahungoding.com/" @if(isset($primary_color)) style="color: {{$primary_color}}" @else style="color: #6777ef;" @endif>TAHUNGODING</a>
         </div>
       </footer>
     </div>

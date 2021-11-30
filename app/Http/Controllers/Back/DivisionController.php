@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Division;
 use App\Models\SubDivision;
+use App\Models\Web;
 use Alert;
 
 class DivisionController extends Controller
@@ -19,6 +20,7 @@ class DivisionController extends Controller
     {
         $data['division'] = Division::all();
         $data['sub_division'] = SubDivision::all();
+        $data['web'] = Web::all();
         return view('back.division.index', $data);
     }
 

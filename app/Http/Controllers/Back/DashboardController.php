@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Back;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Web;
 
 class DashboardController extends Controller
 {
@@ -14,7 +15,8 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        return view('back.dashboard.index');
+        $data['web'] = Web::all();
+        return view('back.dashboard.index', $data);
     }
 
     /**

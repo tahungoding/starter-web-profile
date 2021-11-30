@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Back;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Web;
 use Alert;
 use Storage;
 
@@ -19,6 +20,7 @@ class ProductController extends Controller
     {
         $data['product'] = Product::paginate(6);
         $data['allProduct'] = Product::all();
+        $data['web'] = Web::all();
         return view('back.product.index', $data);
     }
 

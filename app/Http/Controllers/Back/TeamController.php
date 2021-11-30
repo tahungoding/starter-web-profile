@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Division;
 use App\Models\SubDivision;
+use App\Models\Web;
 use Storage;
 use Alert;
 
@@ -22,6 +23,7 @@ class TeamController extends Controller
         $data['team'] = Team::all();
         $data['division'] = Division::all();
         $data['sub_division'] = SubDivision::all();
+        $data['web'] = Web::all();
         return view('back.team.index', $data);
     }
 

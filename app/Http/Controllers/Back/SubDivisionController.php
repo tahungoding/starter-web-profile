@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Back;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\SubDivision;
+use App\Models\Web;
 use Alert;
 class SubDivisionController extends Controller
 {

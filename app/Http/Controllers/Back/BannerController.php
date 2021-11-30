@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Back;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Banner;
+use App\Models\Web;
 use Alert;
 use Storage;
 class BannerController extends Controller
@@ -17,6 +18,7 @@ class BannerController extends Controller
     public function index()
     {
         $data['banner'] = Banner::all();
+        $data['web'] = Web::all();
         return view('back.banner.index', $data);
     }
 

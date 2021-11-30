@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Back;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Event;
+use App\Models\Web;
 use Storage;
 use Alert;
 
@@ -19,6 +20,7 @@ class EventController extends Controller
     {
         $data['event'] = Event::paginate(6);
         $data['allEvent'] = Event::all();
+        $data['web'] = Web::all();
         return view('back.event.index', $data);
     }
 
