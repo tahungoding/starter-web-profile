@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Back\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Back\ProfileWebController;
-use App\Http\Controllers\Back\ProductController;
+use App\Http\Controllers\Back\JasaController;
 use App\Http\Controllers\Back\ProjectController;
 use App\Http\Controllers\Back\TeamController;
 use App\Http\Controllers\Back\DivisionController;
@@ -14,6 +14,7 @@ use App\Http\Controllers\Back\EventController;
 use App\Http\Controllers\Back\BannerController;
 use App\Http\Controllers\Back\RoleController;
 use App\Http\Controllers\Back\PermissionController;
+use App\Http\Controllers\Front\HomeController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -30,6 +31,8 @@ Route::get('/', function () {
 });
 
 Route::resource('login', LoginController::class);
+Route::resource('beranda', HomeController::class);
+
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::get('logout', [LoginController::class, 'logout'])->name('logout');
@@ -43,11 +46,11 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::resource('dashboard', DashboardController::class);
     Route::resource('profile-web', ProfileWebController::class);
 
-    Route::resource('products', ProductController::class);
-    Route::post('products/destroy-all', [ProductController::class, 'destroyAll'])->name('products.destroyAll');
-    Route::post('products/check-product-name', [ProductController::class, 'checkProductName'])->name('checkProductName');
-    Route::post('product/search-product', [ProductController::class, 'productSearch'])->name('productSearch');
-    Route::post('product/pagination', [ProductController::class, 'productPagination'])->name('productPagination');
+    Route::resource('jasa', JasaController::class);
+    Route::post('jasa/destroy-all', [JasaController::class, 'destroyAll'])->name('jasa.destroyAll');
+    Route::post('jasa/check-jasa-name', [JasaController::class, 'checkJasaName'])->name('checkJasaName');
+    Route::post('jasas/search-jasa', [JasaController::class, 'jasaSearch'])->name('jasaSearch');
+    Route::post('jasas/pagination', [JasaController::class, 'jasaPagination'])->name('jasaPagination');
 
     Route::resource('projects', ProjectController::class);
     Route::post('projects/destroy-all', [ProjectController::class, 'destroyAll'])->name('projects.destroyAll');

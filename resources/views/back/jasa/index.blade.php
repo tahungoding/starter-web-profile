@@ -1,5 +1,5 @@
 @extends('layouts.main', ['web' => $web])
-@section('title', 'Event')
+@section('title', 'Jasa')
 @section('css')
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.min.css"
@@ -49,24 +49,25 @@
 @section('container')
 <section class="section">
   <div class="section-header">
-    <h1>Event</h1>
+    <h1>Jasa</h1>
     <div class="section-header-breadcrumb">
       <div class="breadcrumb-item active"><a href="{{ route('dashboard.index') }}">Dashboard</a></div>
-      <div class="breadcrumb-item">Event</div>
+      <div class="breadcrumb-item">Jasa</div>
     </div>
   </div>
 
   <div class="section-body">
     <div class="row">
-      <div class="col-12 col-md-6 col-lg-12">
+      <div class="col-12 col-md-12 col-lg-12">
         <div class="card">
           <div class="card-header">
             <div class="d-flex justify-content-between w-100">
-              <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#tambahEvent"><i
+              <button class="btn btn-sm btn-primary" data-toggle="modal" data-target="#tambahJasa"><i
                   class="fas fa-plus-circle"></i></button>
-              @if (count($event))
+              @if (count($jasa))
               <div class="d-flex justify-content-between">
-                <input type="search" class="form-control desktop-search" id="eventSearch" placeholder="Cari Event..." autocomplete="off" style="margin-right: 20px;">
+                <input type="search" class="form-control desktop-search" id="jasaSearch" placeholder="Cari Produk..."
+                  autocomplete="off" style="margin-right: 20px;">
                 <input type="checkbox" id="checkAll" autocomplete="off" style="margin-right: 20px; display:none;">
                 <button class="btn btn-sm btn-danger" id="deleteAllButton" data-toggle="modal"
                   data-target="#deleteAllConfirm" style="margin-right: 20px; display:none;"><i
@@ -85,10 +86,11 @@
             </div>
           </div>
         </div>
-        @if (count($event))
+        @if (count($jasa))
         <div class="card mobile-search-card" style="display: none">
           <div class="card-header">
-            <input type="search" class="form-control mobile-search" id="mobileEventSearch" placeholder="Cari Event..." autocomplete="off">
+            <input type="search" class="form-control mobile-search" id="mobileJasaSearch"
+              placeholder="Cari Produk..." autocomplete="off">
           </div>
         </div>
         @endif
@@ -97,47 +99,36 @@
     <div id="searchResult">
 
     </div>
-    <div id="eventData">
-      @include('back.event.pagination')
+    <div id="jasaData">
+      @include('back.jasa.pagination')
     </div>
   </div>
 </section>
-<div class="modal fade" tabindex="-1" role="dialog" id="tambahEvent">
-  <div class="modal-dialog modal-dialog-centered" role="document">
+
+<div class="modal fade" tabindex="-1" role="dialog" id="tambahJasa">
+  <div class="modal-dialog " role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Tambah Event</h5>
+        <h5 class="modal-title">Tambah Jasa</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form action="{{ route('events.store') }}" method="post" id="tambahEventForm" enctype="multipart/form-data">
+      <form action="{{ route('jasa.store') }}" method="post" id="tambahJasaForm" enctype="multipart/form-data">
         @csrf
         <div class="modal-body">
           <div class="form-group">
-            <label for="event_name">Nama</label>
-            <input type="text" class="form-control" name="event_name" placeholder="Nama">
+            <label for="name">Nama</label>
+            <input type="text" class="form-control" name="jasa_name" placeholder="Nama">
           </div>
           <div class="form-group">
-            <label for="event_description">Deskripsi</label>
-            <textarea name="event_description" id="event_description" class="form-control" placeholder="Deskripsi"
+            <label for="description">Deskripsi</label>
+            <textarea class="form-control" name="jasa_description" placeholder="Deskripsi"
               style="height: 100%;"></textarea>
           </div>
           <div class="form-group">
-            <label for="event_youtube">Youtube</label>
-            <input type="text" class="form-control" name="event_youtube" placeholder="Link Youtube">
-          </div>
-          <div class="form-group">
-            <label for="event_date">Tanggal</label>
-            <input type="date" class="form-control" name="event_date">
-          </div>
-          <div class="form-group">
-            <label for="event_location">Lokasi</label>
-            <input type="text" class="form-control" name="event_location">
-          </div>
-          <div class="form-group">
-            <label for="event_image">Gambar</label>
-            <input type="file" class="form-control dropify" name="event_image"
+            <label for="image">Gambar</label>
+            <input type="file" class="form-control dropify" name="jasa_image"
               data-allowed-file-extensions="png jpg jpeg" data-show-remove="false">
             <div id="errorImage">
             </div>
@@ -152,60 +143,43 @@
   </div>
 </div>
 
-@foreach ($allEvent as $events)
-<div class="modal fade" tabindex="-1" role="dialog" id="editEvent{{$events->id}}">
+@foreach ($allJasa as $jasa)
+<div class="modal fade" tabindex="-1" role="dialog" id="editJasa{{$jasa->id}}">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Edit Event</h5>
+        <h5 class="modal-title">Edit Jasa</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form action="{{ route('events.update', $events->id) }}" method="post" id="editEventForm{{ $events->id }}"
+      <form action="{{ route('jasa.update', $jasa->id) }}" method="post" id="editJasaForm"
         enctype="multipart/form-data">
         @csrf
         @method('PUT')
-        <input type="hidden" id="checkEventName{{ $events->id }}" value="{{ $events->name }}">
+        <input type="hidden" id="checkJasaName" value="{{ $jasa->name }}">
         <div class="modal-body">
           <div class="form-group">
-            <label for="edit_event_name">Nama</label>
-            <input type="text" class="form-control" name="edit_event_name" id="edit_event_name" placeholder="Nama"
-              value="{{ $events->name }}">
+            <label for="name">Nama</label>
+            <input type="text" class="form-control" name="edit_jasa_name" id="editName" placeholder="Nama"
+              value="{{ $jasa->name }}">
           </div>
           <div class="form-group">
-            <label for="edit_event_description">Deskripsi</label>
-            <textarea name="edit_event_description" id="edit_event_description" class="form-control"
-              placeholder="Deskripsi" style="height: 100%;">{{ $events->description }}</textarea>
+            <label for="description">Deskripsi</label>
+            <textarea class="form-control" name="edit_jasa_description" placeholder="Deskripsi"
+              style="height: 100%;">{{ $jasa->description }}</textarea>
           </div>
           <div class="form-group">
-            <label for="edit_event_youtube">Youtube</label>
-            <input type="text" class="form-control" name="edit_event_youtube" id="edit_event_youtube"
-              placeholder="Link Youtube" value="{{ $events->youtube }}">
-          </div>
-
-          <div class="form-group">
-            <label for="edit_event_date">Tanggal</label>
-            <input type="date" class="form-control" name="edit_event_date" id="edit_event_date"
-              value="{{ $events->date }}">
-          </div>
-
-          <div class="form-group">
-            <label for="edit_event_location">Lokasi</label>
-            <input type="text" class="form-control" name="edit_event_location" id="edit_event_location"
-              value="{{ $events->location }}">
-          </div>
-          <div class="form-group">
-            <label for="edit_event_image">Gambar</label>
-            <input type="file" class="form-control dropify" name="edit_event_image"
-              data-allowed-file-extensions="png jpg jpeg" data-default-file="@if(!empty($events->image) &&
-                            Storage::exists($events->image)){{ Storage::url($events->image) }}@endif"
+            <label for="image">Gambar</label>
+            <input type="file" class="form-control dropify" name="edit_jasa_image"
+              data-allowed-file-extensions="png jpg jpeg" data-default-file="@if(!empty($jasa->image) &&
+                            Storage::exists($jasa->image)){{ Storage::url($jasa->image) }}@endif"
               data-show-remove="false">
           </div>
         </div>
         <div class="modal-footer bg-whitesmoke br">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
-          <button type="submit" class="btn btn-primary" id="editEventButton">Ubah</button>
+          <button type="submit" class="btn btn-primary" id="editJasaButton">Ubah</button>
         </div>
       </form>
     </div>
@@ -213,8 +187,8 @@
 </div>
 @endforeach
 
-@foreach ($allEvent as $events)
-<div class="modal fade" tabindex="-1" role="dialog" id="more{{$events->id}}">
+@foreach ($allJasa as $jasa)
+<div class="modal fade" tabindex="-1" role="dialog" id="more{{$jasa->id}}">
   <div class="modal-dialog modal-dialog-centered" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -224,20 +198,13 @@
         </button>
       </div>
       <div class="modal-body">
-
-        <p><b>Tanggal</b> : {{ $events->date }}</p>
-        <p><b>Lokasi</b> : {{ $events->location }}</p>
-        <p>{{ $events->name }}</p>
-
-        @if(!empty($events->image) && Storage::exists($events->image))
-        <img src="{{ Storage::url($events->image) }}" alt="" class="img-fluid rounded mt-1"
+        <p>{{ $jasa->name }}</p>
+        @if(!empty($jasa->image) && Storage::exists($jasa->image))
+        <img src="{{ Storage::url($jasa->image) }}" alt="" class="img-fluid rounded mt-1"
           style="width:100%; height:200px; object-fit:cover;">
         @endif
         <br><br>
-        <p>{{ $events->description }}</p>
-        @if(isset($events->youtube))
-        <input type="text" class="form-control" value="{{ $events->youtube }}" readonly>
-        @endif
+        <p>{{ $jasa->description }}</p>
       </div>
       <div class="modal-footer bg-whitesmoke br">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
@@ -256,11 +223,11 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      <form action="{{ route('events.destroy', '') }}" method="post" id="deleteEventForm">
+      <form action="{{ route('jasa.destroy', '') }}" method="post" id="deleteJasaForm">
         @csrf
         @method('delete')
         <div class="modal-body">
-          Apakah anda yakin untuk <b>menghapus</b> event ini ?
+          Apakah anda yakin untuk <b>menghapus</b> jasa ini ?
         </div>
         <div class="modal-footer bg-whitesmoke br">
           <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
@@ -281,7 +248,7 @@
         </button>
       </div>
       <div class="modal-body">
-        Apakah anda yakin untuk <b>menghapus semua</b> event ?
+        Apakah anda yakin untuk <b>menghapus semua</b> jasa ?
       </div>
       <div class="modal-footer bg-whitesmoke br">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Kembali</button>
@@ -291,6 +258,7 @@
   </div>
 </div>
 @endsection
+
 @section('js')
 <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.19.3/dist/jquery.validate.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.min.js"
@@ -301,50 +269,50 @@
 </script>
 <script>
   $(document).ready(function() {
-    $(document).on('click', '.page-link', function(event) {
-        event.preventDefault();
-        var page = $(this).attr('href').split('page=')[1];
-        event_pagination(page);
-    });
-  
-    function event_pagination(page)
-    {
-      var _token = $("input[name=_token]").val();
-      $.ajax({
-        url: "{{ route('eventPagination') }}",
-        method: "POST",
-        data: {_token:_token, page:page},
-        success: function(data) {
-            $("#eventData").html(data);
-        }
-      });
-    }
-  
-    $("#mobileEventSearch, #eventSearch").keyup(function() {
-      var _token = $("input[name=_token]").val();
-      var originSearch = $("#eventSearch").val();
-      var mobileOriginSearch = $("#mobileEventSearch").val();
-      if(originSearch == "") {
-        var search = $("#mobileEventSearch").val();
-      } else {
-        var search = $("#eventSearch").val();
-      }
-        $.ajax({
-            url:"{{ route('eventSearch') }}",
-            method:"POST",
-            data:{_token:_token, search:search},
-            success:function(data) {
-                if(search == "") {
-                    $('#searchResult').html("");
-                    $("#eventData").css('display','block');
-                } else {
-                    $('#searchResult').html(data);
-                    $("#eventData").css('display','none');
-                }
-            }
-        });
-     });
+  $(document).on('click', '.page-link', function(event) {
+      event.preventDefault();
+      var page = $(this).attr('href').split('page=')[1];
+      jasa_pagination(page);
   });
+
+  function jasa_pagination(page)
+  {
+    var _token = $("input[name=_token]").val();
+    $.ajax({
+      url: "{{ route('jasaPagination') }}",
+      method: "POST",
+      data: {_token:_token, page:page},
+      success: function(data) {
+          $("#jasaData").html(data);
+      }
+    });
+  }
+
+  $("#mobileJasaSearch, #jasaSearch").keyup(function() {
+    var _token = $("input[name=_token]").val();
+    var originSearch = $("#jasaSearch").val();
+    var mobileOriginSearch = $("#mobileJasaSearch").val();
+    if(originSearch == "") {
+      var search = $("#mobileJasaSearch").val();
+    } else {
+      var search = $("#jasaSearch").val();
+    }
+      $.ajax({
+          url:"{{ route('jasaSearch') }}",
+          method:"POST",
+          data:{_token:_token, search:search},
+          success:function(data) {
+              if(search == "") {
+                  $('#searchResult').html("");
+                  $("#jasaData").css('display','block');
+              } else {
+                  $('#searchResult').html(data);
+                  $("#jasaData").css('display','none');
+              }
+          }
+      });
+   });
+});
 </script>
 <script>
   $(document).ready(function() {
@@ -355,48 +323,36 @@
       }
   });
   
-  $("#tambahEventForm").validate({
+  $("#tambahJasaForm").validate({
       rules: {
-        event_name:{
+          jasa_name:{
               required: true,
               remote: {
-                        url: "{{ route('checkEventName') }}",
+                        url: "{{ route('checkJasaName') }}",
                         type: "post",
               }
           },
-          event_description:{
+          jasa_description:{
               required: true,
           },
-          event_image:{
-              required: true,
-          },
-          event_date:{
-              required: true,
-          },
-          event_location:{
+          jasa_image:{
               required: true,
           },
       },
       messages: {
-          event_name: {
-                required: "Nama Event harus di isi",
-                remote: "Nama Event sudah tersedia"
+          jasa_name: {
+                required: "Nama harus di isi",
+                remote: "Nama sudah tersedia"
           },
-          event_description: {
+          jasa_description: {
                   required: "Deskripsi harus di isi",
           },
-          event_image: {
+          jasa_image: {
                   required: "Gambar harus di isi",
           },
-          event_date: {
-                  required: "Tanggal harus di isi",
-          },
-          event_location: {
-                  required: "Lokasi harus di isi",
-          }
       },
       errorPlacement: function(error, element) {
-        if(element.attr("name") == "event_image") {
+        if(element.attr("name") == "jasa_image") {
           error.appendTo("#errorImage");
           // $(".dropify-wrapper").css('border-color', '#f1556c');
         } else {
@@ -410,68 +366,53 @@
   });
 });
 
-function validateEvent(data) {
-  $("#editEventForm" + data.id).validate({
+  $("#editJasaForm").validate({
       rules: {
-        edit_event_name:{
+        edit_jasa_name:{
               required: true,
               remote: {
                         param: {
-                              url: "{{ route('checkEventName') }}",
+                              url: "{{ route('checkJasaName') }}",
                               type: "post",
                         },
                         depends: function(element) {
                           // compare name in form to hidden field
-                          return ($(element).val() !== $('#checkEventName' + data.id).val());
+                          return ($(element).val() !== $('#checkJasaName').val());
                         },
                       }
           },
-          edit_event_description:{
-              required: true,
-          },
-          edit_event_image:{
-              required: true,
-          },
-          edit_event_date:{
-              required: true,
-          },
-          edit_event_location:{
+          edit_jasa_description:{
               required: true,
           },
       },
       messages: {
-          edit_event_name: {
-                required: "Nama Event harus di isi",
-                remote: "Nama Event sudah tersedia"
+        edit_jasa_name: {
+                required: "Nama harus di isi",
+                remote: "Nama sudah tersedia"
           },
-          edit_event_description: {
+          edit_jasa_description: {
                   required: "Deskripsi harus di isi",
-          },
-          edit_event_image: {
-                  required: "Gambar harus di isi",
-          },
-          edit_event_date: {
-                  required: "Tanggal harus di isi",
-          },
-          edit_event_location: {
-                  required: "Lokasi harus di isi",
           },
       },
       submitHandler: function(form) {
-        $("#editEventButton").prop('disabled', true);
-          form.submit();
+        $("#editJasaButton").prop('disabled', true);
+            form.submit();
       }
   });
-}
+
 $("#deleteAllModalButton").click(function() {
     $(this).attr('disabled', true); 
     $("#destroyAllForm").submit();
 });
 
-const deleteEvent = $("#deleteEventForm").attr('action');
+const deleteJasa = $("#deleteJasaForm").attr('action');
 
-  function deleteThisEvent(data) {
-    $("#deleteEventForm").attr('action', `${deleteEvent}/${data.id}`);
+  function deleteThisJasa(data) {
+    $("#deleteJasaForm").attr('action', `${deleteJasa}/${data.id}`);
+  }
+
+  function readDescription(data) {
+    $("#descriptionText").html(data.description);
   }
 
   $("#setting").click(function() {

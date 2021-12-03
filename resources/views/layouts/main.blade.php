@@ -95,11 +95,9 @@
           <ul class="sidebar-menu">
               <li class="{{ request()->routeIs('dashboard.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('dashboard.index') }}"><i class="fas fa-fire"></i> <span>Dashboard</span></a></li>
               <li class="{{ request()->routeIs('profile-web.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('profile-web.index') }}"><i class="fas fa-id-card"></i> <span>Profile Web</span></a></li>
-              <li class="{{ request()->routeIs('products.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('products.index') }}"><i class="fas fa-box"></i> <span>Product</span></a></li>
-              <li class="{{ request()->routeIs('projects.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('projects.index') }}"><i class="fas fa-tools"></i> <span>Project</span></a></li>
+              <li class="{{ request()->routeIs('jasa.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('jasa.index') }}"><i class="fas fa-box"></i> <span>Jasa</span></a></li>
               <li class="{{ request()->routeIs('divisions.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('divisions.index') }}"><i class="fas fa-th-large"></i> <span>Division</span></a></li>
               <li class="{{ request()->routeIs('teams.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('teams.index') }}"><i class="fas fa-users"></i> <span>Team</span></a></li>
-              <li class="{{ request()->routeIs('events.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('events.index') }}"><i class="fas fa-calendar-week"></i> <span>Event</span></a></li>
               <li class="{{ request()->routeIs('banners.index') ? 'active' : '' }}"><a class="nav-link" href="{{ route('banners.index') }}"><i class="fas fa-image"></i> <span>Banner</span></a></li>
               <li class="nav-item dropdown">
                 <a href="#" class="nav-link has-dropdown"><i class="fas fa-users-cog"></i><span>Hak Akses</span></a>
