@@ -9,16 +9,6 @@ class Team extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'fullname', 'photo', 'position', 'division_id', 'sub_division_id'
+        'fullname', 'photo', 'position'
     ];
-
-    public function divisions()
-    {
-        return $this->belongsTo(Division::class, 'division_id');
-    }
-
-    public function sub_divisions()
-    {
-        return $this->belongsTo(SubDivision::class, 'sub_division_id');
-    }
 }

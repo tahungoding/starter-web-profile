@@ -21,8 +21,6 @@ class TeamController extends Controller
     public function index()
     {
         $data['team'] = Team::all();
-        $data['division'] = Division::all();
-        $data['sub_division'] = SubDivision::all();
         $data['web'] = Web::all();
         return view('back.team.index', $data);
     }
@@ -52,8 +50,6 @@ class TeamController extends Controller
             'fullname' => $request->team_fullname,
             'photo' => $photo,
             'position' => $request->team_position,
-            'division_id' => $request->team_division_id,
-            'sub_division_id' => $request->team_sub_division_id,
         ];
 
         Team::create($data)
@@ -106,8 +102,6 @@ class TeamController extends Controller
             'fullname' => $request->edit_team_fullname ? $request->edit_team_fullname : $team->fullname, 
             'photo' => $request->hasFile('edit_team_photo') ? $edit_photo : $team->photo, 
             'position' => $request->edit_team_position ? $request->edit_team_position : $team->position, 
-            'division_id' => $request->edit_team_division_id ? $request->edit_team_division_id : $team->division_id, 
-            'sub_division_id' => $request->edit_team_sub_division_id ? $request->edit_team_sub_division_id : $team->sub_division_id, 
         ];
 
         $team->update($data)

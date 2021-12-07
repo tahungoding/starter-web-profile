@@ -6,6 +6,7 @@ use App\Http\Controllers\Back\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Back\ProfileWebController;
 use App\Http\Controllers\Back\JasaController;
+use App\Http\Controllers\Back\TestimonyController;
 use App\Http\Controllers\Back\ProjectController;
 use App\Http\Controllers\Back\TeamController;
 use App\Http\Controllers\Back\DivisionController;
@@ -51,6 +52,12 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::post('jasa/check-jasa-name', [JasaController::class, 'checkJasaName'])->name('checkJasaName');
     Route::post('jasas/search-jasa', [JasaController::class, 'jasaSearch'])->name('jasaSearch');
     Route::post('jasas/pagination', [JasaController::class, 'jasaPagination'])->name('jasaPagination');
+
+    Route::resource('testimonies', TestimonyController::class);
+    Route::post('testimonies/destroy-all', [TestimonyController::class, 'destroyAll'])->name('testimony.destroyAll');
+    Route::post('testimonies/check-testimony-name', [TestimonyController::class, 'checkTestimonyName'])->name('checkTestimonyName');
+    Route::post('testimony/search-testimony', [TestimonyController::class, 'testimonySearch'])->name('testimonySearch');
+    Route::post('testimony/pagination', [TestimonyController::class, 'testimonyPagination'])->name('testimonyPagination');
 
     Route::resource('projects', ProjectController::class);
     Route::post('projects/destroy-all', [ProjectController::class, 'destroyAll'])->name('projects.destroyAll');

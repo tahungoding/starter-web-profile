@@ -85,8 +85,6 @@
                       <th>Nama Lengkap</th>
                       <th>Photo</th>
                       <th>Jabatan</th>
-                      <th>Divisi</th>
-                      <th>Sub Divisi</th>
                       <th>Aksi</th>
                     </tr>
                   </thead>
@@ -105,16 +103,6 @@
                         @endif
                       </td>
                       <td>{{ $teams->position }}</td>
-                      <td>
-                        @if (isset($teams->divisions->name))
-                        {{ $teams->divisions->name }}
-                        @endif
-                      </td>
-                      <td>
-                        @if (isset($teams->sub_divisions->name))
-                        {{ $teams->sub_divisions->name }}
-                        @endif
-                      </td>
                       <td>
                         <button type="button" class="btn btn-sm btn-warning" data-toggle="modal"
                           data-target="#editTeam{{$teams->id}}" onclick="validateEditTeam({{$teams}})"><i
@@ -159,32 +147,6 @@
             <input type="text" class="form-control" name="team_position" placeholder="Jabatan">
           </div>
           <div class="form-group">
-            <label for="division">Divisi</label>
-            <select class="form-control" name="team_division_id">
-              @if (count($division))
-              <option value="">Pilih Divisi</option>
-              @foreach ($division as $divisions)
-              <option value="{{ $divisions->id }}">{{ $divisions->name }}</option>
-              @endforeach
-              @else
-              <option value="">Divisi Tidak Tersedia</option>
-              @endif
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="sub_division">Sub Divisi</label>
-            <select class="form-control" name="team_sub_division_id">
-              @if (count($sub_division))
-              <option value="">Pilih Sub Divisi</option>
-              @foreach ($sub_division as $sub_divisions)
-              <option value="{{ $sub_divisions->id }}">{{ $sub_divisions->name }}</option>
-              @endforeach
-              @else
-              <option value="">Sub Divisi Tidak Tersedia</option>
-              @endif
-            </select>
-          </div>
-          <div class="form-group">
             <label for="team_photo">Foto</label>
             <input type="file" class="form-control dropify" name="team_photo" data-allowed-file-extensions="png jpg jpeg"
               data-show-remove="false">
@@ -225,32 +187,6 @@
             <label for="edit_team_position">Jabatan</label>
             <input type="text" class="form-control" name="edit_team_position" id="edit_team_position"
               placeholder="Deskripsi" value="{{ $teams->position }}">
-          </div>
-          <div class="form-group">
-            <label for="edit_team_division">Divisi</label>
-            <select class="form-control" name="edit_team_division_id">
-              @if (count($division))
-              <option value="">Pilih Divisi</option>
-              @foreach ($division as $divisions)
-              <option value="{{ $divisions->id }}" {{ $divisions->id == $teams->division_id ? 'selected' : '' }}>{{ $divisions->name }}</option>
-              @endforeach
-              @else
-              <option value="">Divisi Tidak Tersedia</option>
-              @endif
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="edit_team_sub_division">Sub Divisi</label>
-            <select class="form-control" name="edit_team_sub_division_id">
-              @if (count($sub_division))
-              <option value="">Pilih Sub Divisi</option>
-              @foreach ($sub_division as $sub_divisions)
-              <option value="{{ $sub_divisions->id }}" {{ $sub_divisions->id == $teams->sub_division_id ? 'selected' : '' }}>{{ $sub_divisions->name }}</option>
-              @endforeach
-              @else
-              <option value="">Sub Divisi Tidak Tersedia</option>
-              @endif
-            </select>
           </div>
           <div class="form-group">
             <label for="edit_photo">Foto</label>

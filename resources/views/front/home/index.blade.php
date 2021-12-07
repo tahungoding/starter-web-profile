@@ -353,42 +353,17 @@ img {
       <h2 class="heading bottom-line text-center pt-3" style="border-bottom:3px solid #232525; width: 20%; margin:auto; padding: 10px;">Tim Kita</h2>
       <br><br><br>
       <div class="row">
+        @foreach($team as $teams)
         <div class="col-sm-3">
           <div class="card">
             <div class="card-body">
-              <img src="{{ asset('ikbal.jpg') }}" class="img-fluid rounded mb-4" alt="image-one">
-              <h2 style="font-size: 18px; ">Ikbal Malik Ramadhan</h2>
-              <span style="color: #232525; font-size: 12px;">BACKEND</span>
+              <img src="{{ Storage::url($teams->photo) }}" class="img-fluid rounded mb-4" alt="image-one">
+              <h2 style="font-size: 18px; ">{{ $teams->name }}</h2>
+              <span style="color: #232525; font-size: 12px;">{{ $teams->position }}</span>
             </div>
           </div>
         </div>
-        <div class="col-sm-3">
-          <div class="card">
-            <div class="card-body">
-              <img src="{{ asset('rizal.jpg') }}" class="img-fluid rounded mb-4" alt="image-one">
-              <h2 style="font-size: 18px;">Rizal Jalaludin</h2>
-              <span style="color: #232525; font-size: 12px;">FRONTEND</span>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-3">
-          <div class="card">
-            <div class="card-body">
-              <img src="{{ asset('ridwan.jpg') }}" class="img-fluid rounded mb-4" alt="image-one">
-              <h2 style="font-size: 18px;">Ridwan Permana</h2>
-              <span style="color: #232525; font-size: 12px;">FRONTEND</span>
-            </div>
-          </div>
-        </div>
-        <div class="col-sm-3">
-          <div class="card">
-            <div class="card-body">
-              <img src="{{ asset('indra.jpg') }}" class="img-fluid rounded mb-4" alt="image-one">
-              <h2 style="font-size: 18px;">Indra Yuda</h2>
-              <span style="color: #232525; font-size: 12px;">UI/UX</span>
-            </div>
-          </div>
-        </div>
+        @endforeach
       </div>
       <br><br><br><br>
     </div>

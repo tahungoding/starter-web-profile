@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Front;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Team;
 
 class HomeController extends Controller
 {
@@ -14,7 +15,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('front.home.index');
+        $data['team'] = Team::all();
+        return view('front.home.index', $data);
     }
 
     /**
