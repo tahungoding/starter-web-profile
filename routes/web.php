@@ -27,12 +27,9 @@ use App\Http\Controllers\Front\HomeController;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
 
 Route::resource('login', LoginController::class);
-Route::resource('beranda', HomeController::class);
+Route::resource('/', HomeController::class);
 
 
 Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
